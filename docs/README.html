@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestor de Registros WinCC — README</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1b2430;--muted:#5b6675;--line:#dde2e8;--accent:#1f5fa8;--accent-soft:#e7eff9;--warn:#b26a00;--warn-soft:#fff4e0;--code:#f0f2f5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#12161c;--panel:#1a2029;--ink:#e4e8ee;--muted:#9aa5b3;--line:#2c3440;--accent:#6aa5e8;--accent-soft:#1d2b3c;--warn:#f0b050;--warn-soft:#3a2e18;--code:#222a35}}
+:root[data-theme="dark"]{--bg:#12161c;--panel:#1a2029;--ink:#e4e8ee;--muted:#9aa5b3;--line:#2c3440;--accent:#6aa5e8;--accent-soft:#1d2b3c;--warn:#f0b050;--warn-soft:#3a2e18;--code:#222a35}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Segoe UI",system-ui,sans-serif}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);max-width:1200px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:28px 16px;border-right:1px solid var(--line)}
+nav.toc .brand{font-weight:700;margin-bottom:14px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:5px 8px;border-radius:6px;font-size:13.5px}
+nav.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+nav.toc .grp{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:16px 8px 4px}
+main{padding:36px 44px 80px;min-width:0}
+header.hero,section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 28px;margin-bottom:20px}
+header.hero h1{margin:0 0 6px;font-size:27px}
+h2{font-size:20px;margin:0 0 12px;padding-bottom:8px;border-bottom:2px solid var(--accent-soft)}
+h3{font-size:16px;margin:18px 0 6px}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:13px;background:var(--code);padding:1px 5px;border-radius:4px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;font-size:13px;line-height:1.5}
+pre code{background:none;padding:0}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft)}
+.tw{overflow-x:auto}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+a{color:var(--accent)}
+.theme-btn{float:right;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12.5px}
+.src{color:var(--muted);font-size:12.5px}
+@media (max-width:900px){.layout{grid-template-columns:1fr}nav.toc{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px}main{padding:16px}header.hero,section{padding:18px 16px}}
+@media print{nav.toc,.theme-btn{display:none}.layout{display:block}body{background:#fff}section{border:0;padding:0 0 10px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc">
+  <div class="brand">Gestor de Registros WinCC</div>
+  <a href="#estructura">Estructura</a>
+  <a href="#puesta">Puesta en marcha</a>
+  <a href="#dependencias">Dependencias</a>
+  <a href="#proyectos">Proyectos</a>
+  <a href="#ingesta">Ingesta sin pérdida</a>
+  <a href="#limites">Límites de alarma</a>
+  <a href="#informes">Informes firmados (PDF y Excel)</a>
+  <a href="#usuarios">Usuarios</a>
+  <a href="#integracion">Integración con WinCC</a>
+  <a href="#motor">Cambiar de motor SQL</a>
+  <a href="#pendiente">Pendiente</a>
+  <div class="grp">Otros documentos</div>
+  <a href="Guia_Gestor_Registros.html">Guía técnica y de uso</a>
+  <a href="CLAUDE.html">Reglas del proyecto</a>
+</nav>
+<main>
+<header class="hero">
+  <button class="theme-btn" id="themeBtn" type="button">Tema claro/oscuro</button>
+  <h1>Gestor de Registros WinCC</h1>
+  <p>Visor e informes auditados de los registros CSV de <b>WinCC Runtime Advanced</b> (TIA Portal):
+     variables de proceso, analizador de red, alarmas y AuditTrail. Pensado para abrirse desde una
+     pestaña <b>Informes</b> de WinCC en el mismo PC.</p>
+  <p class="src">Versión HTML de <code>README.md</code>.</p>
+</header>
+
+<section id="estructura">
+<h2>Estructura</h2>
+<div class="tw"><table>
+<tr><th>Ruta</th><th>Contenido</th></tr>
+<tr><td><code>app/</code></td><td>Código Python</td></tr>
+<tr><td><code>app/wincc_csv.py</code></td><td>Lector de los CSV de WinCC (cp1252, coma decimal, <code>$RT_OFF$</code>, checksum)</td></tr>
+<tr><td><code>app/ingest.py</code></td><td>Ingesta en 2 etapas con cola persistente (sin pérdida ni duplicados)</td></tr>
+<tr><td><code>app/models.py</code>, <code>app/db.py</code></td><td>Modelo SQL (SQLAlchemy). SQLite en desarrollo, cambiable por URL</td></tr>
+<tr><td><code>app/analytics.py</code></td><td>Re-muestreo, mín/máx/media/mediana, anomalías</td></tr>
+<tr><td><code>app/limits.py</code></td><td>Límites HH/H/L/LL: detección desde FileAlarms + configuración persistente</td></tr>
+<tr><td><code>app/auth.py</code></td><td>Usuarios WinCC + desarrolladores, contraseñas, sesiones, bloqueo</td></tr>
+<tr><td><code>app/audit.py</code></td><td>Audit trail propio encadenado por SHA-256</td></tr>
+<tr><td><code>app/reports.py</code></td><td>Informes firmados: datos congelados, firmas, versiones, verificación</td></tr>
+<tr><td><code>app/report_pdf.py</code></td><td>Maquetación del PDF (gráficas, estadística, valores tabulados, firmas)</td></tr>
+<tr><td><code>app/report_xlsx.py</code></td><td>El mismo informe en Excel (.xlsx)</td></tr>
+<tr><td><code>app/pades.py</code></td><td>Sellos digitales: PAdES del PDF, .p7s del Excel, certificado</td></tr>
+<tr><td><code>app/api.py</code>, <code>app/main.py</code></td><td>API REST, tareas programadas, servidor web</td></tr>
+<tr><td><code>static/</code></td><td>Interfaz web (HTML + JS + ECharts, sin compilación)</td></tr>
+<tr><td><code>config/config.yaml</code></td><td>Proyectos, rutas, BD, horarios, retención</td></tr>
+<tr><td><code>scripts/</code></td><td>Utilidades (ingesta manual, crear usuario, dependencias, arranque con Windows)</td></tr>
+<tr><td><code>tests/</code></td><td>Pruebas automáticas (pytest)</td></tr>
+<tr><td><code>docs/</code></td><td>Documentación en HTML</td></tr>
+<tr><td><code>reportes_pruebas/</code></td><td>(Generado por <code>probar.ps1</code>) evidencia de cada ejecución de pruebas y cobertura</td></tr>
+<tr><td><code>data/</code></td><td>(Generado) BD SQLite, cola, estado, respaldos. No versionar</td></tr>
+</table></div>
+</section>
+
+<section id="puesta">
+<h2>Puesta en marcha (desarrollo)</h2>
+<pre><code>cd GestorRegistros
+py -3.12 -m venv .venv
+.venv\Scripts\pip install -r requirements-lock.txt
+.venv\Scripts\python scripts\crear_usuario.py --usuario dev.nombre --rol desarrollador
+.venv\Scripts\python run.py</code></pre>
+<p>Abrir <a href="http://127.0.0.1:8080">http://127.0.0.1:8080</a>. Al arrancar se vacía la cola y se leen los CSV nuevos.</p>
+<p>Pruebas (167): <code>.\scripts\probar.ps1</code> ejecuta todo con cobertura y guarda la evidencia en
+   <code>reportes_pruebas\</code> (falla si una prueba falla o si ingest/wincc_csv/reports/auth bajan del 90 % de cobertura).
+   <code>-Rapido</code> omite la prueba de volumen de 3 meses. Solo pruebas: <code>.venv\Scripts\python -m pytest -q -m "not lento"</code>.
+   Detalle de cada prueba en la <a href="Guia_Gestor_Registros.html#pruebas">guía técnica, apartado 9</a>.</p>
+</section>
+
+<section id="dependencias">
+<h2>Dependencias</h2>
+<ul>
+  <li><code>requirements.txt</code>: dependencias <b>directas</b> con versión fijada.</li>
+  <li><code>requirements-lock.txt</code>: árbol completo (<code>pip freeze</code>) para una instalación idéntica.</li>
+  <li>Para añadir una: <code>.\scripts\agregar_dependencia.ps1 paquete</code> (instala, fija la versión y regenera el lock).</li>
+</ul>
+</section>
+
+<section id="proyectos">
+<h2>Proyectos</h2>
+<p>Cada proyecto WinCC se declara en <code>config/config.yaml</code> con su carpeta raíz y las subcarpetas de
+   <code>registros</code>, <code>analizador</code>, <code>alarmas</code> y <code>audit</code>. Se leen también los ficheros
+   <code>.csv.keep*</code> que WinCC crea al reiniciar.</p>
+</section>
+
+<section id="ingesta">
+<h2>Ingesta sin pérdida de datos</h2>
+<p>WinCC guarda como máximo 500.000 registros por fichero. El gestor copia los datos a la base de datos
+   (retención configurable, por defecto 92 días ≈ 3 meses):</p>
+<ol>
+  <li><b>Recolección</b>: copia cada CSV, toma las filas nuevas y escribe un <b>lote</b> en <code>data/queue/pending</code>
+      (escritura atómica + fsync). Solo después avanza la marca de lectura (<code>data/state/read_state.json</code>).</li>
+  <li><b>Carga</b>: cada lote entra a la BD en una transacción; la inserción es idempotente (lo ya cargado se
+      ignora). Si la BD falla, el lote queda en cola y se reintenta.</li>
+  <li>Si WinCC reinicia el fichero (cambia la primera fila), se relee completo; los duplicados se descartan.</li>
+</ol>
+<p>Horarios (<code>config.yaml → ingest</code>): lectura incremental cada 15 min y una <b>lectura diaria garantizada a
+   las 12:00</b> que además aplica la retención. Con 1 registro/min y 5 variables un fichero tarda ~69 días en
+   llenarse, así que aunque solo corriera la lectura diaria no se perderían datos.</p>
+</section>
+
+<section id="limites">
+<h2>Límites de alarma</h2>
+<p><code>FileAlarms</code> dice qué niveles existen por tag (p. ej. <code>TT-001 Alarma HH</code>) pero <b>no el valor numérico</b>.
+   En la pestaña <i>Límites de alarma</i>:</p>
+<ul>
+  <li>asocie cada variable a su tag (automático si el nombre empieza por el tag, p. ej. <code>TT-601.Proc_Var</code>);</li>
+  <li>pulse <b>Sugerir</b>: estima el límite con el valor registrado al activarse cada alarma;</li>
+  <li>revise/ajuste LL, L, H, HH y el rango del instrumento y pulse <b>Guardar</b>.</li>
+</ul>
+<p>Se guardan <b>una sola vez</b> en la BD y en <code>data/limits_backup/&lt;proyecto&gt;.json</code>; si la BD se recrea se
+   restauran automáticamente. Cada cambio queda en el audit trail (antes/después, usuario, fecha).</p>
+<p>Anomalías detectadas: alarma (HH/LL) y pre-alarma (H/L) con duración y pico, fuera de rango del
+   instrumento, dato inválido de WinCC (Validity ≠ 1), huecos (indica si fue por <code>$RT_OFF$</code>), valor
+   congelado y valores atípicos (z robusto MAD). Umbrales en <code>config.yaml → analysis</code>.</p>
+</section>
+
+<section id="informes">
+<h2>Informes firmados (PDF y Excel)</h2>
+<div class="callout">Nunca se generan automáticamente: solo al pulsar <b>Generar reporte</b> en la pestaña <i>Análisis</i>, con el
+   rango, el muestreo y las variables seleccionados en ese momento.</div>
+<h3>Contenido del PDF (A4 apaisado)</h3>
+<ol>
+  <li>Identificación (proyecto, periodo, muestreo, versión, hash SHA-256 de los datos) y resumen estadístico.</li>
+  <li>Una página por variable: gráfica (media, banda mín–máx, límites y zonas de alarma), estadística y eventos/anomalías.</li>
+  <li><b>Valores tabulados</b> de todas las variables graficadas: valor medio de cada intervalo (el mismo que se
+      grafica), celdas en rojo (fuera de HH/LL) o ámbar (fuera de H/L). Con pocas variables los bloques de
+      filas se ponen lado a lado para ahorrar páginas.</li>
+  <li>Audit trail WinCC del periodo.</li>
+  <li>Firmas electrónicas: nombre, usuario, rol, significado y fecha/hora.</li>
+</ol>
+<h3>Firmas</h3>
+<p>Usuario + contraseña re-ingresada + significado, registradas en el audit trail:</p>
+<div class="tw"><table>
+<tr><th>Significado</th><th>Rol mínimo</th><th>Regla</th></tr>
+<tr><td>Elaborado</td><td>operador</td><td>al generar el informe</td></tr>
+<tr><td>Revisado</td><td>supervisor</td><td>otro usuario</td></tr>
+<tr><td>Aprobado</td><td>supervisor</td><td>otro usuario, después de la revisión</td></tr>
+</table></div>
+<p>Los datos se <b>congelan</b> al generar (<code>data/reports/&lt;id&gt;/datos.json.gz</code>) y cada firma emite una nueva
+   versión con los mismos datos, <b>en PDF y en Excel</b> (<code>report.xlsx: true</code>). El PDF lleva un <b>sello digital PAdES</b>.
+   El Excel (.xlsx, mismo contenido: identificación, estadística, valores tabulados, gráficas nativas, eventos, audit
+   WinCC y firmas, con las hojas protegidas) va acompañado de un <b>sello .p7s</b> (firma CMS separada con el mismo
+   certificado). Por defecto el gestor crea su propio certificado en <code>data/certs</code> (para producción, configure
+   un certificado corporativo en <code>config.yaml → report.cert_pfx</code>). Se registra el SHA-256 de cada .pdf, .xlsx y
+   .p7s. En la pestaña <i>Informes</i>, <b>Verificar archivo</b> dice si una copia es auténtica, de qué formato y versión.
+   Los informes anteriores a la exportación Excel la generan al descargarla, a partir de los mismos datos congelados.</p>
+<p>Límite: <code>report.max_table_rows</code> (20.000 filas por defecto; 7 días a 1 min ≈ 10.080 filas ≈ 450 páginas
+   con 10 variables).</p>
+</section>
+
+<section id="usuarios">
+<h2>Usuarios</h2>
+<ul>
+  <li><b>WinCC</b>: se detectan en el AuditTrail (inicios de sesión) y se crean <b>inactivos</b>. WinCC no expone
+      sus contraseñas, así que un administrador asigna una contraseña inicial y el usuario la cambia al entrar.
+      El rol por defecto sale del grupo WinCC (Administrador → admin, Supervisor → supervisor, Operador → operador).</li>
+  <li><b>Desarrolladores</b>: cuentas propias (<code>origen = desarrollador</code>), separadas y trazables.</li>
+  <li>Roles: lector &lt; operador &lt; supervisor (edita límites) &lt; admin/desarrollador (usuarios, ingesta).</li>
+  <li>Bloqueo tras 5 intentos fallidos; sesiones de 8 h.</li>
+</ul>
+</section>
+
+<section id="integracion">
+<h2>Integración con WinCC (pestaña Informes)</h2>
+<p>En la pantalla <i>Informes</i> de WinCC RT Advanced, un botón con la función de sistema <b>IniciarPrograma</b> (StartProgram):</p>
+<div class="tw"><table>
+<tr><th>Programa</th><td><code>C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe</code></td></tr>
+<tr><th>Parámetros</th><td><code>--app=http://127.0.0.1:8080</code></td></tr>
+</table></div>
+<p>Se abre como ventana propia sin barra de navegación. (El control <i>Navegador HTML</i> de RT Advanced usa el
+   motor de Internet Explorer y no es compatible con la interfaz.)</p>
+<div class="callout warn">Para que el gestor arranque con Windows: <code>scripts\instalar_tarea_inicio.ps1</code> (como administrador).<br>
+   Sin internet en planta: ejecutar antes <code>scripts\descargar_vendor.ps1</code> para guardar ECharts en local.</div>
+</section>
+
+<section id="motor">
+<h2>Cambiar de motor SQL</h2>
+<p>Cambiar <code>database.url</code> en <code>config.yaml</code> (hay ejemplos de SQL Server y PostgreSQL en el propio fichero) e
+   instalar el driver con <code>agregar_dependencia.ps1</code> (<code>pyodbc</code> o <code>psycopg[binary]</code>). Las tablas se crean
+   solas al arrancar. Los límites se restauran desde <code>data/limits_backup</code>.</p>
+</section>
+
+<section id="pendiente">
+<h2>Pendiente (siguientes fases)</h2>
+<ul>
+  <li>Migraciones de esquema con Alembic antes de pasar a producción.</li>
+  <li>Paso del usuario activo de WinCC al abrir la pestaña (inicio de sesión único).</li>
+</ul>
+<p>La hoja de ruta completa, por prioridad, está en la <a href="Guia_Gestor_Registros.html#mejoras">guía técnica</a>.</p>
+</section>
+</main>
+</div>
+<script>
+(function(){var r=document.documentElement,K="guia-tema";try{var t=localStorage.getItem(K);if(t)r.setAttribute("data-theme",t);}catch(e){}
+document.getElementById("themeBtn").addEventListener("click",function(){var d=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);var n=d?"light":"dark";r.setAttribute("data-theme",n);try{localStorage.setItem(K,n);}catch(e){}});})();
+</script>
+</body>
+</html>

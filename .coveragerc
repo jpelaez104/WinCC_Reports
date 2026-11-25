@@ -1,0 +1,18 @@
+# Configuracion de la medicion de cobertura (pytest-cov). Uso: scripts\probar.ps1
+[run]
+source = app
+branch = True
+data_file = reportes_pruebas/.coverage
+
+[report]
+show_missing = True
+skip_covered = False
+precision = 1
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    raise NotImplementedError
+
+[html]
+directory = reportes_pruebas/cobertura
+title = Gestor de Registros WinCC - cobertura de pruebas

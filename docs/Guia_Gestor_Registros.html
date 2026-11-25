@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestor de Registros WinCC — Guía técnica y de uso</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --ink:#1b2430; --muted:#5b6675; --line:#dde2e8;
+  --accent:#1f5fa8; --accent-soft:#e7eff9; --bad:#c62828; --bad-soft:#fdecec;
+  --warn:#b26a00; --warn-soft:#fff4e0; --ok:#2e7d32; --ok-soft:#e8f5e9; --code:#f0f2f5;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161c; --panel:#1a2029; --ink:#e4e8ee; --muted:#9aa5b3; --line:#2c3440;
+    --accent:#6aa5e8; --accent-soft:#1d2b3c; --bad:#ef7070; --bad-soft:#3a2020;
+    --warn:#f0b050; --warn-soft:#3a2e18; --ok:#7cc47f; --ok-soft:#1d3320; --code:#222a35;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161c; --panel:#1a2029; --ink:#e4e8ee; --muted:#9aa5b3; --line:#2c3440;
+  --accent:#6aa5e8; --accent-soft:#1d2b3c; --bad:#ef7070; --bad-soft:#3a2020;
+  --warn:#f0b050; --warn-soft:#3a2e18; --ok:#7cc47f; --ok-soft:#1d3320; --code:#222a35;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif}
+.layout{display:grid;grid-template-columns:260px minmax(0,1fr);max-width:1280px;margin:0 auto}
+nav.toc{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;padding:28px 18px;border-right:1px solid var(--line)}
+nav.toc .brand{font-weight:700;font-size:16px;margin-bottom:4px}
+nav.toc .sub{color:var(--muted);font-size:12px;margin-bottom:18px}
+nav.toc a{display:block;color:var(--muted);text-decoration:none;padding:5px 8px;border-radius:6px;font-size:13.5px}
+nav.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+nav.toc .grp{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:16px 8px 4px;opacity:.8}
+main{padding:36px 44px 80px;min-width:0}
+header.hero{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px 30px;margin-bottom:28px}
+header.hero h1{margin:0 0 6px;font-size:28px;line-height:1.25}
+header.hero p{margin:4px 0;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chip{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:600}
+section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:24px 30px;margin-bottom:22px}
+h2{font-size:21px;margin:0 0 14px;padding-bottom:8px;border-bottom:2px solid var(--accent-soft)}
+h2 .n{color:var(--accent);margin-right:8px}
+h3{font-size:16.5px;margin:22px 0 8px}
+h4{font-size:14.5px;margin:16px 0 6px}
+p{margin:8px 0}
+code,kbd{font-family:Consolas,"Cascadia Mono",monospace;font-size:13px;background:var(--code);padding:1px 5px;border-radius:4px}
+pre{background:var(--code);border:1px solid var(--line);border-radius:8px;padding:12px 14px;overflow:auto;font-size:13px;line-height:1.5}
+pre code{background:none;padding:0}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:600}
+.tw{overflow-x:auto}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:12px 0}
+.callout.warn{border-color:var(--warn);background:var(--warn-soft)}
+.callout.bad{border-color:var(--bad);background:var(--bad-soft)}
+.callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h4{margin-top:0}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps li{counter-increment:s;position:relative;padding:6px 0 6px 40px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:6px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:4px;padding:1px 6px;margin-right:4px}
+.p1{background:var(--bad-soft);color:var(--bad)} .p2{background:var(--warn-soft);color:var(--warn)} .p3{background:var(--ok-soft);color:var(--ok)}
+svg.diagram{width:100%;height:auto;max-width:1000px;display:block;margin:10px auto}
+svg.diagram text{font-family:"Segoe UI",system-ui,sans-serif;fill:var(--ink)}
+svg.diagram .box{fill:var(--panel);stroke:var(--accent);stroke-width:1.5}
+svg.diagram .box2{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+svg.diagram .store{fill:var(--warn-soft);stroke:var(--warn);stroke-width:1.5}
+svg.diagram .arrow{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+svg.diagram .small{font-size:11px;fill:var(--muted)}
+.theme-btn{float:right;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12.5px}
+footer{color:var(--muted);font-size:12.5px;text-align:center;margin-top:30px}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  nav.toc{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px}
+  main{padding:16px}
+  section,header.hero{padding:18px 16px}
+}
+@media print{
+  nav.toc,.theme-btn{display:none}
+  .layout{display:block}
+  body{background:#fff}
+  section{break-inside:avoid-page;border:0;padding:0 0 10px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc">
+  <div class="brand">Gestor de Registros WinCC</div>
+  <div class="sub">Guía técnica y de uso · v2 · 25/11/2026</div>
+  <div class="grp">Exponer</div>
+  <a href="#resumen">1. Resumen ejecutivo</a>
+  <a href="#arquitectura">2. Arquitectura</a>
+  <a href="#tecnologias">3. Tecnologías</a>
+  <div class="grp">Documentar</div>
+  <a href="#codigo">4. Códigos más importantes</a>
+  <a href="#datos">5. Modelo de datos y ficheros</a>
+  <a href="#integridad">6. Seguridad e integridad (GMP)</a>
+  <div class="grp">Enseñar</div>
+  <a href="#uso">7. Guía de uso por rol</a>
+  <a href="#operacion">8. Operación y mantenimiento</a>
+  <a href="#pruebas">9. UnitTest: pruebas automáticas</a>
+  <div class="grp">Mejorar</div>
+  <a href="#mejoras">10. Puntos débiles y hoja de ruta</a>
+  <a href="#guion">11. Guion para una presentación</a>
+  <div class="grp">Otros documentos</div>
+  <a href="README.html">README</a>
+  <a href="CLAUDE.html">Reglas del proyecto</a>
+</nav>
+
+<main>
+<header class="hero">
+  <button class="theme-btn" id="themeBtn" type="button">Tema claro/oscuro</button>
+  <h1>Gestor de Registros WinCC</h1>
+  <p>Visor, analizador e informes PDF firmados de los registros CSV de <b>WinCC Runtime Advanced</b> (TIA Portal):
+     variables de proceso, analizador de red, alarmas y AuditTrail.</p>
+  <p>STE-EngiPharm · Proyectos HVAC ION (Archivos) y HVAC Pharmalik (Ejemplo)</p>
+  <div class="chips">
+    <span class="chip">Python 3.12</span><span class="chip">FastAPI</span><span class="chip">SQLAlchemy 2</span>
+    <span class="chip">SQLite → SQL Server / PostgreSQL</span><span class="chip">pandas / numpy</span>
+    <span class="chip">ECharts</span><span class="chip">reportlab + matplotlib</span><span class="chip">PAdES (pyhanko)</span>
+  </div>
+</header>
+
+<!-- ============================================================ 1 -->
+<section id="resumen">
+<h2><span class="n">1</span>Resumen ejecutivo</h2>
+<h3>El problema</h3>
+<p>WinCC RT Advanced guarda los registros en ficheros CSV con un tope de <b>500.000 filas por fichero</b>. Al llenarse,
+   WinCC los reinicia y la historia se pierde. Además, los CSV no se pueden consultar cómodamente, no tienen
+   estadística, no muestran anomalías y no generan informes firmados como exigen las GMP (audit trail y firma electrónica).</p>
+<h3>La solución</h3>
+<div class="grid2">
+  <div class="card"><h4>Ingesta sin pérdida</h4>Copia los CSV a una base de datos SQL cada 15 min y cada día a las 12:00,
+    con una cola persistente en disco. Guarda <b>3 meses</b> (92 días) de histórico.</div>
+  <div class="card"><h4>Análisis</h4>Gráficas por variable, mínimo, máximo, media y mediana, y detección de anomalías:
+    alarmas HH/LL, pre-alarmas H/L, huecos, sensor congelado, atípicos y datos inválidos.</div>
+  <div class="card"><h4>Informes firmados</h4>Bajo demanda (botón <b>Generar reporte</b>), en <b>PDF y Excel</b>, con gráficas,
+    valores tabulados, audit trail y firmas Elaborado → Revisado → Aprobado. El PDF lleva sello PAdES y el Excel un sello <code>.p7s</code>.</div>
+  <div class="card"><h4>Trazabilidad</h4>Usuarios con rol, sesiones y bloqueo. Audit trail propio encadenado por SHA-256.
+    Cualquier copia del PDF se puede verificar con su huella SHA-256.</div>
+</div>
+<div class="callout">Funciona en el <b>mismo PC que WinCC</b>, solo en <code>127.0.0.1:8080</code> (no se ve desde la
+  red). Se abre desde una pestaña <b>Informes</b> de WinCC como ventana de Edge en modo aplicación.</div>
+</section>
+
+<!-- ============================================================ 2 -->
+<section id="arquitectura">
+<h2><span class="n">2</span>Arquitectura</h2>
+<p>Es una aplicación web <b>monolítica y local</b>, en un solo proceso Python. El servidor HTTP, la API, las tareas
+   programadas y la generación de PDF corren dentro de él. Se eligió así porque el PC de planta no tiene servicios
+   adicionales (IIS, SQL Server, Docker) y porque un solo proceso es fácil de instalar, validar y respaldar.</p>
+
+<svg class="diagram" viewBox="0 0 1000 520" role="img" aria-label="Diagrama de arquitectura">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="fill:var(--muted)"/></marker></defs>
+  <!-- WinCC -->
+  <rect class="store" x="20" y="30" width="200" height="150" rx="10"/>
+  <text x="120" y="56" text-anchor="middle" font-weight="700" font-size="14">WinCC RT Advanced</text>
+  <text x="120" y="80" text-anchor="middle" font-size="12">Registros/*.csv</text>
+  <text x="120" y="98" text-anchor="middle" font-size="12">Analizador de red/*.csv</text>
+  <text x="120" y="116" text-anchor="middle" font-size="12">Alarmas/*.csv</text>
+  <text x="120" y="134" text-anchor="middle" font-size="12">AuditTrail/*.csv</text>
+  <text x="120" y="160" text-anchor="middle" class="small">máx. 500.000 filas/fichero</text>
+  <!-- Proceso -->
+  <rect x="270" y="14" width="500" height="490" rx="14" fill="none" stroke="var(--line)" stroke-dasharray="6 5" style="stroke:var(--line)"/>
+  <text x="520" y="36" text-anchor="middle" font-weight="700" font-size="13">Proceso Python (run.py · uvicorn · 127.0.0.1:8080)</text>
+  <rect class="box2" x="290" y="54" width="220" height="60" rx="8"/>
+  <text x="400" y="78" text-anchor="middle" font-weight="600" font-size="13">APScheduler</text>
+  <text x="400" y="97" text-anchor="middle" class="small">arranque · cada 15 min · 12:00</text>
+  <rect class="box" x="290" y="140" width="220" height="70" rx="8"/>
+  <text x="400" y="164" text-anchor="middle" font-weight="600" font-size="13">Ingesta (ingest.py)</text>
+  <text x="400" y="182" text-anchor="middle" class="small">1. recolección → lote</text>
+  <text x="400" y="198" text-anchor="middle" class="small">2. carga idempotente</text>
+  <rect class="box" x="540" y="140" width="210" height="70" rx="8"/>
+  <text x="645" y="166" text-anchor="middle" font-weight="600" font-size="13">Lector CSV</text>
+  <text x="645" y="186" text-anchor="middle" class="small">wincc_csv.py (cp1252,</text>
+  <text x="645" y="200" text-anchor="middle" class="small">coma decimal, $RT_OFF$)</text>
+  <rect class="box" x="290" y="240" width="460" height="64" rx="8"/>
+  <text x="520" y="264" text-anchor="middle" font-weight="600" font-size="13">API REST (api.py · FastAPI)</text>
+  <text x="520" y="284" text-anchor="middle" class="small">auth · proyectos · variables · límites · análisis · informes · ingesta · audit</text>
+  <rect class="box" x="290" y="330" width="140" height="64" rx="8"/>
+  <text x="360" y="356" text-anchor="middle" font-weight="600" font-size="12.5">analytics.py</text>
+  <text x="360" y="374" text-anchor="middle" class="small">estadística, anomalías</text>
+  <rect class="box" x="450" y="330" width="140" height="64" rx="8"/>
+  <text x="520" y="356" text-anchor="middle" font-weight="600" font-size="12.5">reports.py</text>
+  <text x="520" y="374" text-anchor="middle" class="small">PDF, firmas, PAdES</text>
+  <rect class="box" x="610" y="330" width="140" height="64" rx="8"/>
+  <text x="680" y="356" text-anchor="middle" font-weight="600" font-size="12.5">auth · audit · limits</text>
+  <text x="680" y="374" text-anchor="middle" class="small">usuarios, trazas</text>
+  <rect class="box2" x="290" y="420" width="460" height="64" rx="8"/>
+  <text x="520" y="446" text-anchor="middle" font-weight="600" font-size="13">SQLAlchemy 2 (db.py · models.py)</text>
+  <text x="520" y="466" text-anchor="middle" class="small">la BD se elige solo con database.url</text>
+  <!-- Almacenes -->
+  <rect class="store" x="800" y="380" width="180" height="120" rx="10"/>
+  <text x="890" y="404" text-anchor="middle" font-weight="700" font-size="13">data\</text>
+  <text x="890" y="424" text-anchor="middle" font-size="12">gestor.db (SQLite WAL)</text>
+  <text x="890" y="441" text-anchor="middle" font-size="12">queue\ · state\</text>
+  <text x="890" y="458" text-anchor="middle" font-size="12">reports\ · certs\</text>
+  <text x="890" y="475" text-anchor="middle" font-size="12">limits_backup\</text>
+  <!-- Navegador -->
+  <rect class="store" x="800" y="200" width="180" height="140" rx="10"/>
+  <text x="890" y="226" text-anchor="middle" font-weight="700" font-size="13">Navegador</text>
+  <text x="890" y="246" text-anchor="middle" font-size="12">Edge --app (desde</text>
+  <text x="890" y="262" text-anchor="middle" font-size="12">pestaña Informes WinCC)</text>
+  <text x="890" y="284" text-anchor="middle" class="small">static/index.html</text>
+  <text x="890" y="300" text-anchor="middle" class="small">app.js + ECharts</text>
+  <text x="890" y="316" text-anchor="middle" class="small">sin compilación</text>
+  <!-- flechas -->
+  <path class="arrow" d="M400 114 L400 138"/>
+  <path class="arrow" d="M220 110 C 420 110, 600 110, 645 138"/>
+  <path class="arrow" d="M540 175 L512 175"/>
+  <path class="arrow" d="M400 210 L400 418"/>
+  <path class="arrow" d="M520 304 L520 328"/>
+  <path class="arrow" d="M360 394 L360 418"/>
+  <path class="arrow" d="M680 394 L680 418"/>
+  <path class="arrow" d="M750 452 L798 452"/>
+  <path class="arrow" d="M798 270 L752 270"/>
+  <path class="arrow" d="M752 285 L798 285"/>
+  <text x="775" y="262" text-anchor="middle" class="small">HTTP</text>
+</svg>
+
+<h3>Capas</h3>
+<div class="tw"><table>
+<tr><th>Capa</th><th>Ficheros</th><th>Responsabilidad</th></tr>
+<tr><td>Presentación</td><td><code>static/index.html</code>, <code>app.js</code>, <code>styles.css</code></td><td>Interfaz de una sola página (pestañas Análisis, Informes, Límites de alarma, Alarmas WinCC, Audit trail, Usuarios, Ingesta). JavaScript puro con ECharts, sin paso de compilación.</td></tr>
+<tr><td>API</td><td><code>app/api.py</code></td><td>Endpoints REST <code>/api/...</code>, validación con Pydantic, control de rol por endpoint (<code>require("supervisor")</code>), cookie de sesión.</td></tr>
+<tr><td>Dominio</td><td><code>analytics.py</code>, <code>limits.py</code>, <code>reports.py</code>, <code>report_pdf.py</code>, <code>pades.py</code>, <code>auth.py</code>, <code>audit.py</code></td><td>Reglas de negocio: estadística, anomalías, límites, informes, firmas, usuarios y trazas.</td></tr>
+<tr><td>Ingesta</td><td><code>wincc_csv.py</code>, <code>ingest.py</code></td><td>Leer los CSV de WinCC y pasarlos a la BD sin perder ni duplicar.</td></tr>
+<tr><td>Persistencia</td><td><code>db.py</code>, <code>models.py</code></td><td>Motor y sesiones SQLAlchemy, tablas. Solo tipos genéricos, para poder migrar de motor.</td></tr>
+<tr><td>Arranque</td><td><code>run.py</code>, <code>app/main.py</code>, <code>app/config.py</code></td><td>Carga <code>config.yaml</code>, crea tablas, restaura límites, arranca el planificador y el servidor.</td></tr>
+</table></div>
+
+<h3>Flujo de un dato, del PLC al PDF</h3>
+<ol class="steps">
+  <li>WinCC escribe una fila en <code>Registros\TT-601.csv</code> (hora local, coma decimal, cp1252).</li>
+  <li>El planificador lanza la ingesta. <b>Recolección</b>: copia el CSV a <code>data\tmp</code>, lee solo las filas posteriores a la marca de lectura y escribe un lote <code>.json.gz</code> en <code>data\queue\pending</code> (escritura atómica + fsync). Solo después avanza la marca en <code>data\state\read_state.json</code>.</li>
+  <li><b>Carga</b>: cada lote entra en la BD en una transacción. Lo que ya existe se descarta (clave primaria <code>variable_id + t_ms</code>). Si va bien, el lote pasa a <code>queue\done</code>; si falla, se queda en <code>pending</code> y se reintenta.</li>
+  <li>El usuario elige proyecto, variables, rango y muestreo y pulsa <b>Analizar</b>: <code>analytics.py</code> re-muestrea, calcula la estadística y detecta anomalías con los límites configurados.</li>
+  <li>Pulsa <b>Generar reporte</b>, escribe su contraseña y firma «Elaborado». Los datos se congelan en <code>datos.json.gz</code>, se calcula su SHA-256 y se emite el PDF v1 con sello PAdES.</li>
+  <li>Un supervisor firma «Revisado» (v2) y otro «Aprobado» (v3). Todas las versiones salen de los mismos datos congelados.</li>
+</ol>
+
+<h3>Decisiones de diseño y por qué</h3>
+<div class="tw"><table>
+<tr><th>Decisión</th><th>Motivo</th></tr>
+<tr><td>Aplicación web local en lugar de aplicación de escritorio</td><td>Se integra en WinCC con un simple <i>StartProgram</i> de Edge, sin instalar nada en el cliente. La interfaz se puede abrir también desde otro navegador del mismo PC.</td></tr>
+<tr><td>Escucha solo en <code>127.0.0.1</code></td><td>Reduce la superficie de ataque: nadie de la red llega al gestor.</td></tr>
+<tr><td>Ingesta en dos etapas con cola en disco</td><td>Separa leer de guardar. Si la BD falla, el lote sigue en disco; si se corta la luz a mitad, la escritura atómica evita ficheros a medias.</td></tr>
+<tr><td>Marca de lectura por tiempo + huella de la primera fila</td><td>Detecta cuándo WinCC reinicia un fichero (cambia la huella) y lo relee completo; la carga idempotente elimina los duplicados.</td></tr>
+<tr><td>Planificador dentro del proceso (APScheduler)</td><td>No depende del Programador de tareas de Windows para cada lectura. Con <code>coalesce</code> y <code>misfire_grace_time=3600</code>, una ejecución perdida se recupera una sola vez.</td></tr>
+<tr><td>SQLite con WAL en desarrollo, URL configurable</td><td>Cero instalación. Para producción se cambia una línea a SQL Server o PostgreSQL.</td></tr>
+<tr><td>Informes con datos congelados</td><td>Una firma posterior nunca cambia los números: cada versión del PDF sale del mismo fichero de datos, verificado por su hash.</td></tr>
+<tr><td>Frontend sin compilación</td><td>Cualquier técnico lo modifica con un editor de texto; no hace falta Node.js en la planta.</td></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 3 -->
+<section id="tecnologias">
+<h2><span class="n">3</span>Tecnologías</h2>
+<p>Todas las dependencias están fijadas con versión en <code>requirements.txt</code> (directas) y
+   <code>requirements-lock.txt</code> (árbol completo). Se añaden <b>solo</b> con <code>scripts\agregar_dependencia.ps1</code>.</p>
+<div class="tw"><table>
+<tr><th>Tecnología</th><th>Versión</th><th>Para qué se usa</th></tr>
+<tr><td>Python</td><td>3.12 (venv <code>.venv</code>)</td><td>Lenguaje de todo el servidor.</td></tr>
+<tr><td>FastAPI</td><td>0.165.0</td><td>API REST, validación Pydantic, dependencias de seguridad por rol, ficheros estáticos.</td></tr>
+<tr><td>Uvicorn</td><td>0.54.0</td><td>Servidor HTTP ASGI.</td></tr>
+<tr><td>SQLAlchemy</td><td>2.1.9</td><td>ORM y consultas genéricas; permite cambiar de motor SQL.</td></tr>
+<tr><td>pandas / numpy</td><td>3.1.1 / 2.5.5</td><td>Re-muestreo, estadística, detección de episodios y atípicos (MAD).</td></tr>
+<tr><td>PyYAML</td><td>6.0.4</td><td>Lectura de <code>config/config.yaml</code>.</td></tr>
+<tr><td>APScheduler</td><td>3.11.3</td><td>Tareas programadas: lectura cada 15 min, diaria a las 12:00 y lectura al arrancar.</td></tr>
+<tr><td>reportlab</td><td>5.1.1</td><td>Maquetación del PDF (A4 apaisado, tablas, pie «Página X de Y»).</td></tr>
+<tr><td>matplotlib</td><td>3.11.2</td><td>Gráficas del PDF (motor Agg, sin pantalla) y fuentes DejaVu.</td></tr>
+<tr><td>pyhanko</td><td>0.38.2</td><td>Sello digital PAdES del PDF; trae <code>cryptography</code> (certificado y sello <code>.p7s</code> del Excel) y <code>asn1crypto</code> (verificación del <code>.p7s</code>).</td></tr>
+<tr><td>openpyxl</td><td>3.1.5</td><td>Informe en Excel (.xlsx): hojas, colores por límites, gráficas nativas y protección de hojas.</td></tr>
+<tr><td>ECharts</td><td>5.5.1</td><td>Gráficas interactivas de la interfaz (zoom, bandas, límites). Se carga de <code>static/vendor</code> o, si falta, de la CDN.</td></tr>
+<tr><td>pytest / httpx2</td><td>9.2.0 / 2.16.2</td><td>Pruebas automáticas, incluido el cliente HTTP de FastAPI.</td></tr>
+<tr><td>pytest-cov / hypothesis</td><td>7.1.0 / 6.170.17</td><td>Cobertura de código y pruebas por propiedades (solo desarrollo).</td></tr>
+<tr><td>Edge en modo <code>--app</code></td><td>el de Windows</td><td>Ventana sin barra de navegación lanzada desde WinCC.</td></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 4 -->
+<section id="codigo">
+<h2><span class="n">4</span>Códigos más importantes</h2>
+<p>El código tiene unas 2.600 líneas en Python más unas 870 en la interfaz. Estos son los módulos que hay que conocer, en orden de importancia.</p>
+
+<h3>4.1 Ingesta — <code>app/ingest.py</code> (354 líneas)</h3>
+<p>Es el corazón del sistema: garantiza que no se pierdan ni se dupliquen datos.</p>
+<div class="tw"><table>
+<tr><th>Función</th><th>Qué hace</th></tr>
+<tr><td><code>collect()</code> (l. 125)</td><td>Etapa 1. Para cada CSV que cambió de tamaño o fecha, lo copia, lee las filas nuevas y escribe un lote en <code>queue\pending</code>. <b>Nunca toca la BD.</b></td></tr>
+<tr><td><code>_load_batch()</code> (l. 194)</td><td>Inserta un lote: crea variables nuevas, filtra lo que ya existe y lo inserta en bloques de 5.000 filas.</td></tr>
+<tr><td><code>load_pending()</code> (l. 315)</td><td>Etapa 2. Carga todos los lotes pendientes, uno por transacción, y mueve a <code>done</code> los cargados.</td></tr>
+<tr><td><code>forget_state_if_db_empty()</code></td><td>Si la BD es nueva o se vació (con <code>data\</code> intacta), olvida las marcas de lectura de ese proyecto para releer sus CSV completos.</td></tr>
+<tr><td><code>purge()</code> (l. 344)</td><td>Retención: borra datos de más de 92 días y lotes <code>done</code> de más de 7 días.</td></tr>
+<tr><td><code>run_ingest()</code> (l. 365)</td><td>Orquesta todo bajo un bloqueo de proceso (<code>data\ingest.lock</code>) para que no corran dos ingestas a la vez.</td></tr>
+</table></div>
+<p>El orden clave de <code>collect()</code>: primero el lote en disco, después la marca de lectura.</p>
+<pre><code>_atomic_write_bytes(paths.pending / name, gzip.compress(json.dumps(batch).encode("utf-8")))
+...
+# el lote ya esta en disco: ahora si se avanza la marca de lectura
+state[key] = {"fingerprint": res.fingerprint, "read_t_ms": new_t, "size": ..., "mtime": ...}
+_atomic_write_bytes(paths.state, json.dumps(state).encode("utf-8"))</code></pre>
+<div class="callout ok">Si el PC se apaga entre las dos escrituras, el peor caso es releer filas ya encoladas; la carga
+  idempotente las descarta. Nunca se salta una fila.</div>
+
+<h3>4.2 Lector de CSV de WinCC — <code>app/wincc_csv.py</code> (202 líneas)</h3>
+<ul>
+  <li><code>parse_file(path, min_t_ms)</code> (l. 152) detecta el tipo de fichero por la cabecera (<code>detect_kind</code>: registro, alarma o audit) y devuelve muestras, eventos <code>$RT_OFF$</code>, alarmas o filas de audit.</li>
+  <li><code>parse_number()</code> entiende la coma decimal; <code>time_ms_to_epoch_ms()</code> convierte el «TimeString/Time_ms» de WinCC.</li>
+  <li><code>row_fingerprint()</code> crea la huella de la primera fila para detectar reinicios de fichero.</li>
+  <li>Lee también los <code>.csv.keep*</code> que WinCC crea al reiniciar el runtime.</li>
+</ul>
+
+<h3>4.3 Análisis — <code>app/analytics.py</code> (227 líneas)</h3>
+<div class="tw"><table>
+<tr><th>Función</th><th>Qué hace</th></tr>
+<tr><td><code>resample()</code> (l. 60)</td><td>Agrupa los datos crudos en intervalos del muestreo elegido (1 min por defecto) y da mín/máx/media por intervalo.</td></tr>
+<tr><td><code>statistics_for()</code> (l. 82)</td><td>Mín, máx, media, mediana, desviación, cobertura de datos y número de muestras.</td></tr>
+<tr><td><code>detect_anomalies()</code> (l. 112)</td><td>Episodios de alarma (HH/LL), pre-alarma (H/L), fuera de rango, dato inválido (Validity ≠ 1), huecos (indica si fue <code>$RT_OFF$</code>), valor congelado y atípicos por z robusto (MAD).</td></tr>
+<tr><td><code>analyze_variable()</code> (l. 220)</td><td>Junta lo anterior más las alarmas WinCC del tag; es lo que usan la pantalla y el PDF.</td></tr>
+</table></div>
+<p>Umbrales en <code>config.yaml → analysis</code>: <code>flatline_minutes: 60</code>, <code>outlier_mad_z: 6.0</code>, <code>gap_factor: 3.0</code>.</p>
+
+<h3>4.4 Informes firmados — <code>app/reports.py</code>, <code>report_pdf.py</code>, <code>report_xlsx.py</code>, <code>pades.py</code></h3>
+<div class="tw"><table>
+<tr><th>Función</th><th>Qué hace</th></tr>
+<tr><td><code>reports.create_report()</code> (l. 122)</td><td>Verifica la contraseña del firmante, analiza las variables, congela los datos, calcula <code>data_hash</code> (SHA-256 del JSON canónico) y emite la v1 con la firma «Elaborado».</td></tr>
+<tr><td><code>reports.sign_report()</code> (l. 196)</td><td>Valida orden y reglas (sin repetir significado ni usuario, Aprobado solo tras Revisado, datos intactos) y emite la versión siguiente.</td></tr>
+<tr><td><code>reports.verify_sha256()</code></td><td>Dice si un PDF, un Excel o un sello <code>.p7s</code> es auténtico, qué versión es y si es la última. Para el Excel comprueba además que el par <code>.xlsx</code> + <code>.p7s</code> guardado es válido.</td></tr>
+<tr><td><code>reports._emit_xlsx()</code></td><td>En cada versión, después del PDF: genera el Excel con las firmas vigentes y el SHA-256 del PDF de esa versión, lo sella (<code>.p7s</code>) y registra ambos SHA-256 en <code>report_exports</code>.</td></tr>
+<tr><td><code>reports.xlsx_path()</code></td><td>Entrega el Excel o su sello. Si el informe es anterior a la exportación Excel (o el fichero falta), lo genera en ese momento con los mismos datos congelados y las firmas de esa versión, y lo anota en el audit trail (<code>INFORME_EXCEL_GENERADO</code>).</td></tr>
+<tr><td><code>report_xlsx.render_xlsx()</code></td><td>Construye el libro: Identificación, Estadística, Valores tabulados (misma rejilla y regla de colores que el PDF), Gráficas nativas, Eventos, Audit WinCC y Firmas. Hojas y estructura protegidas.</td></tr>
+<tr><td><code>pades.sign_detached()</code> / <code>verify_detached()</code></td><td>Sello CMS/PKCS#7 separado (<code>.p7s</code>, SHA-256) con el mismo certificado que el PDF, y su verificación: resumen del fichero, firma y si el certificado es el del gestor.</td></tr>
+<tr><td><code>report_pdf.render_pdf()</code> (l. 162)</td><td>Maqueta: identificación y resumen → una página por variable (gráfica, KPI, eventos) → valores tabulados → audit WinCC → firmas.</td></tr>
+<tr><td><code>report_pdf.tabulated_values()</code> (l. 146)</td><td>Rejilla de tiempo común para todas las variables: el valor tabulado es exactamente la media graficada.</td></tr>
+<tr><td><code>pades.sign_pdf()</code> (l. 77)</td><td>Sella el PDF (PAdES, SHA-256) con el certificado propio autogenerado o con el <code>.pfx</code> corporativo.</td></tr>
+</table></div>
+<pre><code>def canonical_hash(obj) -> str:
+    # obj ya pasado por _clean(): los NaN se sustituyen por None antes de calcular el hash
+    raw = json.dumps(obj, sort_keys=True, separators=(",", ":"),
+                     ensure_ascii=False, allow_nan=False)
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()</code></pre>
+
+<h3>4.5 Usuarios y audit trail — <code>app/auth.py</code>, <code>app/audit.py</code></h3>
+<ul>
+  <li>Contraseñas con <b>PBKDF2-SHA256, 390.000 iteraciones</b> y sal aleatoria (<code>hash_password</code>, l. 48). Política: 8 caracteres o más, con letras y números.</li>
+  <li><code>verify_credentials(s, usuario, clave, propósito)</code> (l. 169) se usa tanto para el login como para cada firma («FIRMA»), con bloqueo tras 5 fallos.</li>
+  <li><code>sync_wincc_users()</code> (l. 78) crea inactivos los usuarios que aparecen iniciando sesión en el AuditTrail de WinCC; el rol sale de su grupo.</li>
+  <li><code>audit.record()</code> (l. 28): cada evento guarda el hash del anterior. <code>verify_chain()</code> (l. 48) recorre la cadena y detecta cualquier fila modificada o borrada.</li>
+</ul>
+<pre><code>def _digest(prev, ts_ms, username, action, entity, details):
+    payload = "\x1f".join([prev, str(ts_ms), username or "", action, entity or "", details or ""])
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()</code></pre>
+
+<h3>4.6 Límites de alarma — <code>app/limits.py</code> (183 líneas)</h3>
+<ul>
+  <li><code>refresh_alarm_tags()</code> lee de FileAlarms qué niveles existen por tag (p. ej. «TT-001 Alarma HH»). WinCC no da el valor numérico.</li>
+  <li><code>suggest_limits()</code> (l. 93) estima el valor con lo registrado en el instante en que se activó cada alarma.</li>
+  <li><code>set_limits()</code> (l. 144) guarda en la BD, lo registra en el audit trail (antes/después) y hace copia en <code>data\limits_backup\&lt;proyecto&gt;.json</code>; <code>restore_limits_from_backup()</code> los recupera si la BD se recrea.</li>
+</ul>
+
+<h3>4.7 Arranque y planificador — <code>app/main.py</code></h3>
+<pre><code>sch = BackgroundScheduler(job_defaults={"coalesce": True, "max_instances": 1,
+                                        "misfire_grace_time": 3600})
+sch.add_job(_safe_ingest, "cron", hour=12, minute=0, args=["diaria", True])     # + retención
+sch.add_job(_safe_ingest, "interval", minutes=15, args=["periodica"])
+threading.Thread(target=_safe_ingest, args=["arranque"], daemon=True).start()  # al iniciar</code></pre>
+</section>
+
+<!-- ============================================================ 5 -->
+<section id="datos">
+<h2><span class="n">5</span>Modelo de datos y ficheros</h2>
+<div class="tw"><table>
+<tr><th>Tabla</th><th>Contenido</th><th>Clave / unicidad</th></tr>
+<tr><td><code>projects</code>, <code>source_files</code></td><td>Proyectos WinCC y cada CSV con su estado de carga</td><td>(proyecto, ruta)</td></tr>
+<tr><td><code>variables</code></td><td>Variable WinCC, alias, unidad, tag de alarma, activa</td><td>(proyecto, nombre)</td></tr>
+<tr><td><code>samples</code></td><td>Valor, validez y checksum WinCC por instante</td><td><b>PK (variable_id, t_ms)</b>: imposible duplicar</td></tr>
+<tr><td><code>runtime_events</code></td><td>Paradas del runtime (<code>$RT_OFF$</code>)</td><td>(proyecto, grupo, t, tipo)</td></tr>
+<tr><td><code>alarms</code>, <code>alarm_tags</code></td><td>Mensajes de alarma y niveles disponibles por tag</td><td></td></tr>
+<tr><td><code>variable_limits</code></td><td>LL, L, H, HH y rango del instrumento</td><td>una fila por variable</td></tr>
+<tr><td><code>wincc_audit</code></td><td>AuditTrail de WinCC importado</td><td></td></tr>
+<tr><td><code>users</code>, <code>user_sessions</code></td><td>Usuarios (origen WinCC o desarrollador), rol, bloqueo; sesiones por token hasheado</td><td></td></tr>
+<tr><td><code>reports</code>, <code>report_signatures</code>, <code>report_files</code></td><td>Informe, firmas y cada versión del PDF con su SHA-256</td><td>un significado y un usuario por informe</td></tr>
+<tr><td><code>report_exports</code></td><td>Cada versión en Excel: SHA-256 del <code>.xlsx</code> y de su sello <code>.p7s</code></td><td>(informe, versión, formato)</td></tr>
+<tr><td><code>app_audit</code></td><td>Audit trail propio, encadenado</td><td>prev_hash → hash</td></tr>
+</table></div>
+
+<h3>Carpeta <code>data\</code></h3>
+<div class="tw"><table>
+<tr><th>Ruta</th><th>Qué guarda</th></tr>
+<tr><td><code>gestor.db</code> + <code>-wal</code> + <code>-shm</code></td><td>La base SQLite (hoy 93 MB). Los tres ficheros van juntos mientras el gestor corre.</td></tr>
+<tr><td><code>queue\pending</code>, <code>queue\done</code></td><td>Lotes por cargar y lotes cargados (7 días).</td></tr>
+<tr><td><code>state\</code></td><td><code>read_state.json</code> (marcas de lectura) e <code>ingest_status.json</code>.</td></tr>
+<tr><td><code>reports\&lt;id&gt;\</code></td><td><code>datos.json.gz</code> congelado y, por versión, <code>&lt;id&gt;_v1.pdf</code>, <code>&lt;id&gt;_v1.xlsx</code> y <code>&lt;id&gt;_v1.xlsx.p7s</code> (v2, v3…).</td></tr>
+<tr><td><code>certs\</code></td><td>Certificado del sello PAdES <b>con clave privada</b>: no compartir.</td></tr>
+<tr><td><code>limits_backup\</code></td><td>Respaldo JSON de los límites por proyecto.</td></tr>
+<tr><td><code>dev_credentials.txt</code></td><td>Cuenta de desarrollo: <b>borrar en producción</b>.</td></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 6 -->
+<section id="integridad">
+<h2><span class="n">6</span>Seguridad e integridad (enfoque GMP)</h2>
+<p>Mapa orientativo con los requisitos típicos de 21 CFR Part 11 y del Anexo 11 de las GMP de la UE. Lo que
+   falta para una validación formal está en el apartado 10.</p>
+<div class="tw"><table>
+<tr><th>Requisito</th><th>Cómo se cumple</th></tr>
+<tr><td>Acceso controlado</td><td>Login con usuario y contraseña; 4 niveles de rol; bloqueo tras 5 fallos; sesión de 8 h; servidor solo en localhost.</td></tr>
+<tr><td>Audit trail</td><td>Tabla <code>app_audit</code> solo-agregar y encadenada por SHA-256. Registra login, cambios de límites, variables y usuarios, informes, firmas, descargas y verificaciones. Además se importa el AuditTrail de WinCC.</td></tr>
+<tr><td>Firma electrónica</td><td>Usuario + contraseña re-ingresada + significado + declaración aceptada; nombre, fecha y hora impresos en el PDF; hash del registro de firma.</td></tr>
+<tr><td>Separación de funciones</td><td>Revisado y Aprobado los firma otro usuario de rol supervisor o superior; nadie firma dos veces el mismo informe.</td></tr>
+<tr><td>Integridad del dato</td><td>Datos congelados con hash. Cada PDF, Excel y <code>.p7s</code> con SHA-256 registrado. Sello PAdES dentro del PDF y sello CMS (<code>.p7s</code>) del Excel: cualquier modificación del fichero invalida el sello. El PDF y el Excel de una versión salen de los mismos datos, y el Excel lleva el SHA-256 del PDF.</td></tr>
+<tr><td>Conservación</td><td>92 días en la BD; los informes y sus datos congelados se conservan sin purga.</td></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 7 -->
+<section id="uso">
+<h2><span class="n">7</span>Guía de uso por rol</h2>
+<div class="tw"><table>
+<tr><th>Rol</th><th>Puede</th></tr>
+<tr><td>lector</td><td>Ver análisis, alarmas, audit WinCC e informes; verificar PDF.</td></tr>
+<tr><td>operador</td><td>Lo anterior + <b>Generar reporte</b> (firma Elaborado).</td></tr>
+<tr><td>supervisor</td><td>Lo anterior + editar variables y límites, firmar Revisado/Aprobado, ver el audit de la aplicación.</td></tr>
+<tr><td>admin / desarrollador</td><td>Todo + usuarios, sincronizar usuarios WinCC, lanzar ingesta manual.</td></tr>
+</table></div>
+
+<h3>7.1 Entrar</h3>
+<ol class="steps">
+  <li>En WinCC, pestaña <b>Informes</b> → botón que abre Edge en <code>http://127.0.0.1:8080</code>.</li>
+  <li>Usuario y contraseña. La primera vez, un usuario WinCC entra con la contraseña inicial que le dio el administrador y la cambia.</li>
+</ol>
+
+<h3>7.2 Analizar variables</h3>
+<ol class="steps">
+  <li>Pestaña <b>Análisis</b>: elegir el proyecto.</li>
+  <li>Marcar las variables en la lista lateral (se puede filtrar por texto).</li>
+  <li>Elegir el rango de fechas (atajos 24 h y 7 días) y el muestreo: 1 minuto por defecto, valores de 5 min a 1 día, o «Personalizado…» en segundos, minutos u horas.</li>
+  <li>Pulsar <b>Analizar</b>. Aparece una gráfica por variable con la banda mín–máx, los límites y las zonas de alarma, junto con la estadística y la lista de eventos.</li>
+</ol>
+
+<h3>7.3 Generar y firmar un informe</h3>
+<ol class="steps">
+  <li>Con la selección hecha, pulsar <b>Generar reporte</b> (rol operador o superior). <i>El informe nunca se genera solo.</i></li>
+  <li>Escribir título y comentario (opcionales), la contraseña, un comentario de firma, y marcar la declaración. Queda firmado «Elaborado» y se abre el PDF v1.</li>
+  <li>Un supervisor va a la pestaña <b>Informes</b> → <b>Firmar Revisado</b>. Se genera la v2.</li>
+  <li>Otro supervisor pulsa <b>Firmar Aprobado</b>. Se genera la v3, con estado «aprobado».</li>
+  <li>Cada versión queda en <b>PDF</b> y en <b>Excel</b>. En la pestaña <b>Informes</b>, los botones <b>PDF</b>, <b>Excel</b> y
+      <b>Sello .p7s</b> descargan la última versión. El <code>.p7s</code> es la firma del Excel: guárdelo y envíelo siempre junto al <code>.xlsx</code>.</li>
+</ol>
+<h4>Contenido del Excel</h4>
+<div class="tw"><table>
+<tr><th>Hoja</th><th>Contenido</th></tr>
+<tr><td>Identificación</td><td>Proyecto, periodo, muestreo, versión/estado, generado por, hash de datos y resumen estadístico.</td></tr>
+<tr><td>Estadística</td><td>Todos los indicadores por variable, con fechas de mínimo y máximo, cobertura, rango y notas.</td></tr>
+<tr><td>Valores tabulados</td><td>Una fila por intervalo y una columna por variable, como números reales (se pueden filtrar y graficar). Rojo fuera de HH/LL, ámbar fuera de H/L, vacío sin dato.</td></tr>
+<tr><td>Gráficas</td><td>Una gráfica nativa de Excel por variable: media y líneas de límites.</td></tr>
+<tr><td>Eventos</td><td>Eventos y anomalías de todas las variables, con filtro.</td></tr>
+<tr><td>Audit WinCC</td><td>Audit trail de WinCC del periodo.</td></tr>
+<tr><td>Firmas</td><td>Firmas electrónicas (pendientes incluidas), hash de datos, SHA-256 del PDF de la misma versión y cómo verificar.</td></tr>
+</table></div>
+<p>Las hojas están protegidas, sin contraseña, para evitar cambios accidentales. Se puede filtrar y ajustar columnas.
+   La autenticidad no depende de esa protección sino del sello <code>.p7s</code> y del SHA-256 registrado: si alguien cambia
+   una sola celda y guarda, el fichero deja de verificar. Para trabajar con los datos, copie el contenido a un libro nuevo.</p>
+<div class="callout warn">Límite: 20.000 filas de valores tabulados (periodo ÷ muestreo). Si se supera, el gestor indica
+  el muestreo mínimo. Referencia: 7 días a 1 min con 10 variables ≈ 450 páginas.</div>
+
+<h3>7.4 Verificar un PDF o un Excel</h3>
+<p>Pestaña <b>Informes</b> → <b>Verificar archivo</b> → elegir el <code>.pdf</code>, el <code>.xlsx</code> o el <code>.p7s</code>. El navegador calcula su
+   SHA-256 y el gestor responde si es una copia auténtica, de qué formato y versión es, si es la última, si los datos
+   congelados están íntegros y, para el Excel, si su sello <code>.p7s</code> es válido. El certificado del sello se descarga con <b>Certificado</b>.</p>
+<p><b>Fuera del gestor</b> (por ejemplo un auditor externo):</p>
+<ul>
+  <li><b>PDF</b>: Adobe Reader muestra el panel de firmas. Tras instalar <code>gestor_sello.pem</code> como certificado de confianza, aparece como firma válida.</li>
+  <li><b>Excel</b>: con OpenSSL, poniendo el <code>.xlsx</code>, su <code>.p7s</code> y el certificado en la misma carpeta:
+<pre><code>openssl cms -verify -binary -inform DER -in INF-…_v3.xlsx.p7s -content INF-…_v3.xlsx -CAfile gestor_sello.pem -purpose any -out NUL</code></pre>
+  Debe responder <code>Verification successful</code> si el Excel no se tocó. Excel no muestra la cinta de «libro firmado»: la firma va aparte, en el <code>.p7s</code>.
+  <br><i>Comando de referencia: OpenSSL no estaba instalado en el PC de desarrollo y no se ha probado. La verificación del
+  gestor y las pruebas automáticas sí comprueban el sello.</i></li>
+</ul>
+
+<h3>7.5 Configurar límites (supervisor)</h3>
+<ol class="steps">
+  <li>Pestaña <b>Límites de alarma</b>: asociar cada variable a su tag. Es automático si el nombre empieza por el tag, p. ej. <code>TT-601.Proc_Var</code>.</li>
+  <li>Pulsar <b>Sugerir</b>, revisar LL, L, H, HH y el rango del instrumento, y pulsar <b>Guardar</b>. Se hace una sola vez y queda en el audit trail.</li>
+</ol>
+
+<h3>7.6 Usuarios e ingesta (admin)</h3>
+<ul>
+  <li><b>Usuarios</b>: sincronizar desde WinCC, activar, asignar rol y contraseña inicial, desbloquear.</li>
+  <li><b>Ingesta</b>: ver la última lectura, los lotes pendientes y los errores; lanzar una lectura manual.</li>
+</ul>
+</section>
+
+<!-- ============================================================ 8 -->
+<section id="operacion">
+<h2><span class="n">8</span>Operación y mantenimiento</h2>
+<h3>Instalación</h3>
+<pre><code>cd GestorRegistros
+py -3.12 -m venv .venv
+.venv\Scripts\pip install -r requirements-lock.txt
+.venv\Scripts\python scripts\crear_usuario.py --usuario admin.planta --rol admin
+.venv\Scripts\python run.py</code></pre>
+<h3>Arranque automático con Windows</h3>
+<p>Ejecutar <code>scripts\instalar_tarea_inicio.ps1</code> como administrador. Crea la tarea <b>GestorRegistrosWinCC</b>:
+   se ejecuta como SYSTEM al iniciar el equipo, sin ventana (<code>pythonw</code>) y se reinicia si falla.</p>
+<h3>¿Qué pasa si el PC estuvo apagado?</h3>
+<p>Al arrancar, el gestor vacía la cola y lee todo lo nuevo desde la última marca: no se pierde nada mientras WinCC no
+   haya llenado y reiniciado un fichero. Con 1 registro/min un fichero tarda unos <b>69 días</b> en llenarse.</p>
+<h3>Respaldo</h3>
+<ul>
+  <li>Copiar la carpeta <code>data\</code> completa, mejor con el gestor detenido. Nunca copiar solo <code>gestor.db</code> en marcha sin su <code>-wal</code>.</li>
+  <li>Lo único irrecuperable desde los CSV son los límites, los usuarios, los informes firmados y el audit propio.</li>
+</ul>
+<h3>Configuración (<code>config/config.yaml</code>)</h3>
+<div class="tw"><table>
+<tr><th>Clave</th><th>Valor actual</th><th>Efecto</th></tr>
+<tr><td><code>database.url</code></td><td><code>sqlite:///data/gestor.db</code></td><td>Motor y ubicación de la BD.</td></tr>
+<tr><td><code>retention_days</code></td><td>92</td><td>Días de histórico en la BD.</td></tr>
+<tr><td><code>ingest.interval_minutes</code> / <code>daily_time</code></td><td>15 / 12:00</td><td>Frecuencia de lectura.</td></tr>
+<tr><td><code>server.host</code> / <code>port</code></td><td>127.0.0.1 / 8080</td><td>Dónde escucha.</td></tr>
+<tr><td><code>security.*</code></td><td>480 min, 5 intentos</td><td>Duración de sesión y bloqueo.</td></tr>
+<tr><td><code>report.*</code></td><td>20.000 filas, PAdES activo</td><td>Límites del PDF y certificado.</td></tr>
+<tr><td><code>projects</code></td><td>archivos, ejemplo</td><td>Carpetas de cada proyecto WinCC.</td></tr>
+</table></div>
+<h3>Problemas frecuentes</h3>
+<div class="tw"><table>
+<tr><th>Síntoma</th><th>Causa probable / solución</th></tr>
+<tr><td>No abre <code>127.0.0.1:8080</code></td><td>El gestor no corre o el puerto está ocupado: revisar la tarea programada o ejecutar <code>run.py</code> a mano.</td></tr>
+<tr><td>Gráficas en blanco sin internet</td><td>Falta ECharts local: ejecutar <code>scripts\descargar_vendor.ps1</code>.</td></tr>
+<tr><td>Lotes en <code>queue\pending</code> que no bajan</td><td>Error de BD: ver la pestaña Ingesta. Los lotes se reintentan solos.</td></tr>
+<tr><td>Usuario bloqueado</td><td>Un admin lo desbloquea en la pestaña Usuarios.</td></tr>
+<tr><td>«Demasiadas filas» al generar un informe</td><td>Subir el muestreo o acortar el rango.</td></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 9 -->
+<section id="pruebas">
+<h2><span class="n">9</span>UnitTest: pruebas automáticas</h2>
+<p>Última ejecución (25/11/2026): <b>176 pruebas, 176 en verde, sin avisos, 2 min</b>. Cobertura de <code>app\</code>: <b>95,2 %</b>
+   (módulos críticos: <code>wincc_csv</code> 100 %, <code>reports</code> 98,8 %, <code>auth</code> 98,7 %, <code>ingest</code> 94,7 %,
+   <code>report_xlsx</code> 94,5 %).</p>
+<pre><code>.\scripts\probar.ps1                               # TODO: pruebas + cobertura + evidencia (recomendado)
+.\scripts\probar.ps1 -Rapido                       # igual, sin la prueba de volumen
+.venv\Scripts\python -m pytest -q -m "not lento"   # solo pruebas, día a día (~35 s)
+.venv\Scripts\python -m pytest -q -s tests\test_volumen.py   # muestra los tiempos medidos
+$env:GESTOR_HYPOTHESIS = "exhaustivo"; .venv\Scripts\python -m pytest -q tests\test_propiedades.py   # 1.000 casos por regla (~2 min)</code></pre>
+
+<h3>9.1 ¿Qué es una prueba unitaria y por qué se usan aquí?</h3>
+<p>Una prueba unitaria es un pequeño programa que ejecuta una parte del código con datos conocidos y
+   <b>comprueba automáticamente</b> que el resultado es el esperado (<code>assert</code>). Si alguien cambia el código y
+   rompe algo, la prueba falla en segundos, antes de que el error llegue a la planta.</p>
+<div class="grid2">
+  <div class="card"><h4>Evitar regresiones</h4>Al mejorar el lector de CSV, la ingesta o el PDF, las pruebas confirman que lo que ya funcionaba sigue funcionando.</div>
+  <div class="card"><h4>Probar lo que no se puede provocar a mano</h4>Una caída de la BD o un corte de luz justo entre dos escrituras no se pueden repetir en planta; en una prueba se simulan en milisegundos.</div>
+  <div class="card"><h4>Evidencia para validación GMP</h4>Cada prueba es un caso de prueba repetible con resultado registrado: es la base de la OQ (cualificación operacional).</div>
+  <div class="card"><h4>Documentación viva</h4>La prueba muestra con un ejemplo real qué debe hacer el código (p. ej. «un fichero reiniciado por WinCC no duplica datos»).</div>
+</div>
+<div class="callout">Hay cuatro clases de pruebas. Las <b>unitarias puras</b> (<code>test_wincc_csv.py</code>, <code>test_parametrizadas.py</code>)
+   prueban una función sin BD. Las <b>de integración</b> (la mayoría) usan una BD SQLite y una carpeta WinCC simuladas en un
+   directorio temporal, sin tocar nunca <code>data\gestor.db</code>. Las <b>de referencia</b> (<code>test_golden.py</code>) leen extractos
+   reales de los CSV de planta. Las <b>por propiedades</b> (<code>test_propiedades.py</code>) generan miles de casos al azar.</div>
+
+<h3>9.2 Dependencias de pruebas</h3>
+<div class="tw"><table>
+<tr><th>Paquete</th><th>Versión</th><th>Uso</th></tr>
+<tr><td><b>pytest</b></td><td>9.2.0</td><td>Motor de pruebas: descubre los ficheros <code>tests/test_*.py</code>, ejecuta las funciones <code>test_*</code> y muestra los fallos. Aporta <i>fixtures</i> integradas como <code>tmp_path</code> (carpeta temporal) y <code>monkeypatch</code> (sustituir una función para simular fallos).</td></tr>
+<tr><td><b>httpx2</b></td><td>2.16.2</td><td>Lo usa <code>fastapi.testclient.TestClient</code> para llamar a la API sin levantar un servidor real. Sustituyó a <code>httpx 0.28.1</code> el 24/11/2026: Starlette 1.10 lo marca como obsoleto y daba un <i>StarletteDeprecationWarning</i>. Trae <code>httpcore2</code> y <code>truststore</code>.</td></tr>
+<tr><td><b>pytest-cov</b></td><td>7.1.0</td><td>Mide la <b>cobertura</b>: qué líneas y ramas de <code>app\</code> ejecuta alguna prueba. Trae <code>coverage 7.17.5</code>. Configurado en <code>.coveragerc</code>.</td></tr>
+<tr><td><b>hypothesis</b></td><td>6.170.17</td><td>Pruebas <b>por propiedades</b>: genera casos al azar y, si uno rompe la regla, lo reduce al ejemplo mínimo. Trae <code>sortedcontainers</code>. Guarda en <code>.hypothesis\</code> los casos que fallaron para repetirlos.</td></tr>
+<tr><td>unittest (biblioteca estándar)</td><td>Python 3.12</td><td>No se usa directamente; pytest es compatible con él y es más simple de escribir.</td></tr>
+</table></div>
+<p>Las cuatro están fijadas en <code>requirements.txt</code> en el bloque «Pruebas (desarrollo)» y en <code>requirements-lock.txt</code>.
+   No hacen falta en el PC de producción.</p>
+
+<h3>9.3 Cómo están montadas</h3>
+<div class="tw"><table>
+<tr><th>Fichero</th><th>Qué hace</th></tr>
+<tr><td><code>tests/conftest.py</code></td><td><b><code>make_env()</code></b> crea un proyecto WinCC falso, un <code>config.yaml</code> propio y una BD SQLite temporal, y apunta el gestor a ellos con <code>GESTOR_CONFIG</code>. La fixture <b><code>env</code></b> lo usa en cada prueba, y las de hypothesis lo usan en cada caso generado. <b><code>log_line()</code></b> y <b><code>oa()</code></b> generan filas idénticas a las de WinCC. También define los perfiles de hypothesis <code>normal</code> (60 casos) y <code>exhaustivo</code> (1.000).</td></tr>
+<tr><td><code>tests/datos/</code></td><td>Extractos de CSV reales, con los bytes originales (cp1252): registro <code>File_TT-S6_0.csv</code> (60 filas), analizador <code>File_Potencia0.csv</code> (16 <code>$RT_OFF$</code>), <code>FileAlarms HVAC0.csv</code> (40 alarmas) y <code>AuditTrail0.csv</code> (69 filas con inicios de sesión).</td></tr>
+<tr><td><code>pytest.ini</code></td><td>Carpeta de pruebas, marca <code>lento</code>, <code>--strict-markers</code> (una marca mal escrita es error) y <b>avisos de obsolescencia como error</b>: un aviso como el de httpx hace fallar la batería en vez de pasar desapercibido.</td></tr>
+<tr><td><code>.coveragerc</code></td><td>Mide <code>app\</code> con cobertura de ramas (cada <code>if</code> por sus dos caminos). Resultado en <code>reportes_pruebas\</code>.</td></tr>
+<tr><td><code>scripts/probar.ps1</code></td><td>Ejecuta todo con cobertura y guarda la evidencia con fecha en <code>reportes_pruebas\</code>: <code>resultados_&lt;fecha&gt;.xml</code> (JUnit, archivable), <code>resumen_&lt;fecha&gt;.txt</code> y <code>cobertura\index.html</code> (líneas sin probar en rojo). Falla si una prueba falla o si <b>cualquiera</b> de los módulos críticos baja del 90 %.</td></tr>
+</table></div>
+
+<h3>9.4 Pruebas realizadas</h3>
+<div class="tw"><table>
+<tr><th>Prueba</th><th>Qué comprueba</th><th>Riesgo que cubre</th></tr>
+<tr><th colspan="3">test_wincc_csv.py: lector de CSV (unitarias)</th></tr>
+<tr><td><code>test_time_ms_is_ole_date_times_1e6</code></td><td>Una fila real de WinCC se convierte a la hora correcta (±1 s).</td><td>Fechas desplazadas en todo el histórico.</td></tr>
+<tr><td><code>test_parse_log_with_rt_rows</code></td><td>Lee valores con coma, validez, <code>$RT_OFF$</code> y <code>$RT_COUNT$</code>.</td><td>Paradas del runtime tomadas como datos.</td></tr>
+<tr><td><code>test_partial_last_line_is_skipped</code></td><td>Una última línea a medio escribir se descarta y se cuenta.</td><td>Leer mientras WinCC escribe.</td></tr>
+<tr><td><code>test_detects_alarm_and_audit</code></td><td>Reconoce ficheros de alarmas y de AuditTrail (con saltos de línea y tildes).</td><td>Ficheros mal clasificados.</td></tr>
+<tr><td><code>test_file_group_names</code></td><td>Nombre del grupo a partir del fichero, incluidos <code>.keep</code>.</td><td>Variables partidas en grupos distintos.</td></tr>
+<tr><th colspan="3">test_ingest.py: ingesta sin pérdida (la más crítica)</th></tr>
+<tr><td><code>test_incremental_and_idempotent</code></td><td>10 filas → 10; repetir no duplica; añadir 5 → 15.</td><td>Duplicados y relecturas.</td></tr>
+<tr><td><code>test_file_restarted_by_wincc_is_reread</code></td><td>Si WinCC reescribe el fichero desde otra fila, se relee completo: 25 muestras exactas.</td><td>Pérdida al reiniciar el fichero.</td></tr>
+<tr><td><code>test_keep_files_are_ingested_without_duplicates</code></td><td><code>.csv.keep</code> y <code>.csv</code> solapados → 15, no 20.</td><td>Duplicados tras reiniciar el runtime.</td></tr>
+<tr><td><code>test_db_failure_keeps_batch_in_queue</code></td><td>Con la BD «caída» (simulada con <code>monkeypatch</code>) el lote queda en cola; al volver se carga todo.</td><td>Pérdida por fallo de BD.</td></tr>
+<tr><td><code>test_crash_after_batch_before_state_is_safe</code></td><td>Corte de energía simulado justo después de escribir el lote y antes de la marca: no se pierde ni duplica nada.</td><td>Pérdida por apagón.</td></tr>
+<tr><th colspan="3">test_analysis_auth.py: análisis, límites, audit y seguridad</th></tr>
+<tr><td><code>test_limits_episodes_and_resample</code></td><td>Un pico de 40 con HH=35 da un episodio «alarma HH»; 2 h a 5 min = 24 puntos.</td><td>Alarmas no detectadas en el informe.</td></tr>
+<tr><td><code>test_limits_validation_and_backup</code></td><td>Rechaza H &gt; HH y crea el respaldo JSON.</td><td>Límites incoherentes o perdidos.</td></tr>
+<tr><td><code>test_audit_chain_detects_tampering</code></td><td>Modificar una fila del audit rompe la cadena.</td><td>Manipulación del audit trail.</td></tr>
+<tr><td><code>test_login_lockout_and_api</code></td><td>API cerrada sin sesión, login correcto e incorrecto, análisis vía API, bloqueo tras 5 fallos.</td><td>Acceso no autorizado.</td></tr>
+<tr><th colspan="3">test_reports.py: informes firmados</th></tr>
+<tr><td><code>test_tabulated_values_share_time_grid</code></td><td>Todas las variables comparten la misma rejilla de tiempo en la tabla.</td><td>Valores tabulados desalineados.</td></tr>
+<tr><td><code>test_report_generation_signatures_pades_and_verify</code></td><td>Flujo completo: permisos (403), contraseña errónea (401), PDF v1, sello PAdES válido, PDF manipulado detectado, orden y unicidad de firmas (409), v3 aprobada con el mismo hash de datos, audit registrado.</td><td>Firmas inválidas o informes alterados.</td></tr>
+<tr><td><code>test_report_row_limit</code></td><td>Un informe demasiado grande se rechaza (422).</td><td>PDF gigante que bloquea el gestor.</td></tr>
+<tr><th colspan="3">test_operacion.py: operación continua (añadidas el 24/11/2026)</th></tr>
+<tr><td><code>test_purge_respects_retention_and_keeps_regulatory_data</code></td><td>Con 92 días de retención borra solo lo de hace 100 días, borra lotes <code>done</code> de más de 7 días y deja intactos límites, audit trail e informes.</td><td>Borrar datos que no tocaba, o no borrar y llenar el disco.</td></tr>
+<tr><td><code>test_retention_does_not_reload_purged_data</code></td><td>Un CSV reiniciado con datos viejos no vuelve a meter en la BD lo ya purgado.</td><td>Datos fuera de retención que reaparecen.</td></tr>
+<tr><td><code>test_two_ingests_at_once_do_not_overlap</code></td><td>Si la periódica está dentro y llega la manual, la segunda responde «ocupado» y no se duplica nada.</td><td>Dos ingestas pisándose.</td></tr>
+<tr><td><code>test_ingest_lock_between_processes</code></td><td>Con <code>data\ingest.lock</code> tomado por otro proceso (p. ej. <code>scripts\ingestar.py</code>) la ingesta se niega; al liberarse lo lee todo.</td><td>Servicio y script manual a la vez.</td></tr>
+<tr><td><code>test_db_down_before_collect_still_queues_data</code></td><td>Con la BD caída la recolección sigue guardando lotes en disco y después se cargan.</td><td>Pérdida mientras la BD no responde.</td></tr>
+<tr><td><code>test_db_recreated_restores_limits_and_history</code></td><td>BD borrada (o cambio de motor) con <code>data\</code> intacta: al arrancar vuelven el histórico de los CSV y los límites, alias, unidad y tag idénticos.</td><td>Perder límites validados o 3 meses de histórico.</td></tr>
+<tr><th colspan="3">test_permisos_audit.py: seguridad (añadidas el 24/11/2026)</th></tr>
+<tr><td><code>test_matrix_covers_every_endpoint</code></td><td>Cada endpoint de la API tiene un rol declarado en la matriz. Un endpoint nuevo sin declarar hace fallar la prueba.</td><td>Endpoints nuevos sin control de acceso.</td></tr>
+<tr><td><code>test_without_session_everything_is_401</code></td><td>Sin sesión todo responde 401, salvo login y logout.</td><td>Datos accesibles sin entrar.</td></tr>
+<tr><td><code>test_role_matrix</code> (×5 roles)</td><td>28 endpoints × 5 roles: cada rol entra donde debe y recibe 403 donde no.</td><td>Escalada de privilegios.</td></tr>
+<tr><td><code>test_inactive_or_locked_user_loses_session</code></td><td>Desactivar a un usuario corta su sesión abierta al instante.</td><td>Usuario dado de baja que sigue dentro.</td></tr>
+<tr><td><code>test_every_change_is_audited_with_before_and_after</code></td><td>Login fallido y correcto, usuario creado y modificado, variable, límites (antes/después), ingesta manual, cambio de contraseña y logout quedan en el audit trail; la cadena sigue íntegra.</td><td>Cambios sin trazabilidad (GMP).</td></tr>
+<tr><td><code>test_rejected_change_is_not_applied_nor_audited_as_done</code></td><td>Unos límites inválidos se rechazan (422) y no se registran como hechos.</td><td>Audit trail que dice algo que no ocurrió.</td></tr>
+<tr><th colspan="3">test_volumen.py: rendimiento con 3 meses (marca <code>lento</code>)</th></tr>
+<tr><th colspan="3">test_golden.py: CSV reales de planta (añadidas el 25/11/2026)</th></tr>
+<tr><td><code>test_registro_tt_s6</code>, <code>test_analizador_potencia_con_rt_off</code>, <code>test_alarmas_hvac</code>, <code>test_audit_trail</code></td><td>Cada tipo de fichero real se lee igual que lo escribió WinCC: valores, checksum, hora, tildes, dobles espacios y periodo de 2 min. Los valores esperados están copiados a mano de las filas originales.</td><td>Una nueva versión de WinCC que cambie el formato.</td></tr>
+<tr><td><code>test_golden_project_end_to_end</code></td><td>Los cuatro extractos montados como proyecto: 60 muestras, 40 alarmas, 69 filas de audit, 16 paradas, tag AD-004 con H y HH, y el usuario «Admin» creado inactivo con rol admin sin duplicarse.</td><td>Fallos que solo aparecen con datos reales.</td></tr>
+<tr><th colspan="3">test_propiedades.py: hypothesis (añadidas el 25/11/2026)</th></tr>
+<tr><td><code>test_ingest_count_equals_distinct_rows_written</code></td><td>Secuencias al azar de lo que hace WinCC (añadir filas, reiniciar el fichero, rotarlo a <code>.keep</code>, ingerir, BD caída): <b>toda fila presente en un CSV cuando corre una ingesta acaba en la BD, sin duplicados</b>. Verificado con 1.000 secuencias.</td><td>Pérdida o duplicado en combinaciones que nadie pensó.</td></tr>
+<tr><td><code>test_parser_never_loses_complete_rows</code></td><td>Cualquier fichero con filas válidas y una última línea cortada: no se pierde ninguna fila completa.</td><td>Leer mientras WinCC escribe.</td></tr>
+<tr><td><code>test_parse_number_…</code>, <code>test_ole_time_ms_roundtrip…</code></td><td>Cualquier número con coma decimal y cualquier fecha 2000–2099 se convierten sin error (±1 ms).</td><td>Valores o fechas mal convertidos.</td></tr>
+<tr><th colspan="3">test_parametrizadas.py: 101 casos (añadidas el 25/11/2026)</th></tr>
+<tr><td>13 funciones parametrizadas</td><td>Números y fechas de WinCC, <code>Time_ms</code> frente a <code>TimeString</code> en filas reales, tipos de cabecera, los 12 nombres reales de fichero → grupo, límites válidos e inválidos, textos de alarma (incluido «Fallo señal»), rol × permiso, política y hash de contraseñas.</td><td>Casos límite de formato y reglas.</td></tr>
+<tr><th colspan="3">test_analisis_limites.py y test_usuarios_informes.py (añadidas el 25/11/2026)</th></tr>
+<tr><td>Anomalías una por una</td><td>Dato inválido, fallo de señal (no contamina la estadística ni cuenta como alarma), pre-alarma L y alarma LL, solo HH configurado, hueco con y sin <code>$RT_OFF$</code>, valor congelado, atípico, notas y periodo vacío.</td><td>Anomalías no detectadas o mal clasificadas en el informe.</td></tr>
+<tr><td><code>test_suggest_limits_from_wincc_alarm_activations</code></td><td>El botón <b>Sugerir</b> estima HH, H y L con el valor registrado al activarse cada alarma; asocia <code>TT-101.Proc_Var</code> a TT-101 y no a TT-1010. Antes no tenía ninguna prueba.</td><td>Límites sugeridos erróneos.</td></tr>
+<tr><td>Usuarios y sesiones</td><td>Validaciones al crear, todos los cambios de usuario, restablecer clave cierra sesiones, desbloqueo, activar sin clave, sesión caducada, cambio de contraseña, grupo WinCC actualizado sin elevar el rol.</td><td>Accesos indebidos.</td></tr>
+<tr><td>Informes: casos de error</td><td>Fechas al revés, proyecto o variables ajenas, significado no válido, informe inexistente, operador que intenta revisar, firma repetida, datos congelados manipulados (no se firma y la verificación avisa), filtros y PDF inexistente.</td><td>Firmas o informes inválidos.</td></tr>
+<tr><td>CSV defectuosos</td><td>Fichero vacío, sin <code>Time_ms</code>, sin fecha, filas cortas y filtros por tiempo en los tres tipos; cabecera desconocida y lote corrupto (se aparta, no se borra) sin frenar al resto.</td><td>Un fichero malo que detiene toda la ingesta.</td></tr>
+<tr><td><code>test_bad_file_is_closed_even_if_error_is_kept</code>, <code>test_leftover_tmp_copies_are_cleaned</code></td><td>Regresión del fallo encontrado el 25/11/2026 (ver abajo) y limpieza de copias temporales.</td><td>Ingesta abortada por un fichero abierto.</td></tr>
+<tr><td><code>test_three_months_ingest_and_analysis</code></td><td>3 variables × 92 días a 1 min = 397.440 filas. Medido: ingesta 7,7 s (límite 180 s); pasada sin cambios 0,02 s; análisis de 7 días a 1 min 0,21 s por variable (límite 5 s); 92 días a 1 h 0,70 s (límite 10 s).</td><td>Gestor lento o bloqueado con el histórico completo.</td></tr>
+</table></div>
+
+<div class="callout bad"><b>Fallos reales encontrados por las pruebas nuevas (ya corregidos en <code>app/ingest.py</code>).</b>
+  Si se borraba <code>gestor.db</code> o se cambiaba de motor SQL conservando <code>data\</code>:
+  <ol>
+    <li>el histórico <b>no volvía a cargarse</b>, porque la marca de lectura decía que los CSV ya estaban leídos.
+        Ahora <code>forget_state_if_db_empty()</code> detecta un proyecto sin ficheros en la BD (y sin lotes en cola) y
+        relee sus CSV completos;</li>
+    <li>los <b>límites no se restauraban</b> hasta el siguiente reinicio, porque al arrancar aún no existían las
+        variables. Ahora cada ingesta llama a <code>restore_limits_from_backup()</code> después de cargar.</li>
+  </ol>
+</div>
+<div class="callout bad"><b>Fallo real encontrado el 25/11/2026 (corregido en <code>app/wincc_csv.py</code> y <code>app/ingest.py</code>).</b>
+  Con un CSV de cabecera desconocida, <code>parse_file()</code> lanzaba el error sin cerrar el fichero. En Windows un fichero
+  abierto no se puede borrar: la limpieza de la copia temporal fallaba y esa excepción <b>abortaba toda la ingesta</b>, no
+  solo ese fichero. Solo ocurría si algo retenía la traza del error (por ejemplo un registro de logs), por eso aparecía a
+  veces. Ahora el fichero se cierra siempre, un fallo al borrar la copia temporal solo deja un aviso, y las copias
+  que queden se limpian en la siguiente ingesta.</div>
+<div class="callout"><b>Lo que hypothesis aclaró.</b> Su primer contraejemplo fue «WinCC escribe 1 fila y reinicia el fichero
+  antes de que el gestor lo lea». Esa fila no se puede recuperar porque ya no existe en ningún fichero: es el riesgo
+  conocido de dejar el gestor parado ~69 días, no un fallo. La regla quedó formulada con precisión: <i>toda fila presente
+  en un CSV cuando corre una ingesta llega a la BD</i>.</div>
+
+<h3>9.5 Mejoras de las pruebas</h3>
+<p>Las mejoras propuestas se aplicaron el 25/11/2026, salvo el <i>pre-commit hook</i>, que necesita git y git no está instalado en este PC.</p>
+<div class="tw"><table>
+<tr><th>Mejora</th><th>Estado</th><th>Cómo quedó</th></tr>
+<tr><td><b>Medir la cobertura</b></td><td><span class="tag p3">Hecho</span></td><td><code>pytest-cov</code> + <code>.coveragerc</code>. Cobertura total 95,2 %; cada módulo crítico ≥ 94,5 % (meta: 90 %). <code>probar.ps1</code> falla si alguno baja del 90 %.</td></tr>
+<tr><td><b>CSV reales como referencia</b></td><td><span class="tag p3">Hecho</span></td><td><code>tests/datos/</code> + <code>test_golden.py</code>, con valores esperados copiados a mano del fichero original.</td></tr>
+<tr><td><b>Pruebas parametrizadas</b></td><td><span class="tag p3">Hecho</span></td><td><code>test_parametrizadas.py</code>: 101 casos en 13 funciones, más la matriz de roles (×5) de <code>test_permisos_audit.py</code>.</td></tr>
+<tr><td><b>Pruebas por propiedades</b></td><td><span class="tag p3">Hecho</span></td><td><code>hypothesis</code> + <code>test_propiedades.py</code>. Perfil <code>normal</code> (60 casos) a diario y <code>exhaustivo</code> (1.000) antes de instalar.</td></tr>
+<tr><td><b>Marcar las lentas</b></td><td><span class="tag p3">Hecho</span></td><td>Marca <code>lento</code> + <code>--strict-markers</code>; <code>probar.ps1 -Rapido</code> las omite.</td></tr>
+<tr><td><b>Avisos como errores</b></td><td><span class="tag p3">Hecho</span></td><td>En <code>pytest.ini</code> (<code>filterwarnings = error::DeprecationWarning</code>): se aplica siempre, no solo de vez en cuando.</td></tr>
+<tr><td><b>Informe de resultados</b></td><td><span class="tag p3">Hecho</span></td><td><code>probar.ps1</code> guarda en <code>reportes_pruebas\</code> el XML JUnit, el resumen y la cobertura HTML de cada ejecución, con fecha. Sirven como evidencia de OQ.</td></tr>
+<tr><td><b>Ejecutarlas siempre</b></td><td><span class="tag p2">Pendiente</span></td><td>Necesita git (no instalado). Mientras tanto, la regla es ejecutar <code>.\scripts\probar.ps1</code> antes de copiar cambios a planta. Con git, un <i>pre-commit hook</i> que llame a <code>probar.ps1 -Rapido</code>.</td></tr>
+</table></div>
+
+<h3>9.6 Pruebas necesarias para que el proyecto no falle</h3>
+<div class="callout ok"><b>Prioridad alta: hecha (24/11/2026).</b> Retención, matriz de permisos completa, dos ingestas a la vez,
+  restaurar límites tras recrear la BD, volumen de 3 meses y audit de todos los cambios. Están en
+  <code>test_operacion.py</code>, <code>test_permisos_audit.py</code> y <code>test_volumen.py</code> (apartado 9.4).
+  <br><b>25/11/2026:</b> también hechas sesiones, sincronización de usuarios WinCC y anomalías una por una
+  (<code>test_usuarios_informes.py</code>, <code>test_golden.py</code>, <code>test_analisis_limites.py</code>).</div>
+<p>Lo que falta, ordenado por el daño que evitaría:</p>
+<div class="tw"><table>
+<tr><th>Prioridad</th><th>Prueba que falta</th><th>Qué debe comprobar</th></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Planificador</td><td>Se crean las tareas de 12:00 y cada 15 min, y una ejecución perdida se recupera una sola vez.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Otro motor SQL</td><td>Ejecutar la misma batería con <code>database.url</code> apuntando a SQL Server o PostgreSQL antes de migrar.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Interfaz de extremo a extremo</td><td>Con Playwright: entrar, Analizar, Generar reporte, Firmar, Verificar PDF, en Edge.</td></tr>
+<tr><td><span class="tag p3">Baja</span></td><td>Certificado corporativo</td><td>PAdES con un <code>.pfx</code> externo y su contraseña en la variable de entorno.</td></tr>
+<tr><td><span class="tag p3">Baja</span></td><td>Respaldo y recuperación</td><td>Copiar <code>data\</code>, restaurarla en otra carpeta y verificar la cadena de audit y los SHA-256 de los PDF.</td></tr>
+</table></div>
+<div class="callout warn">Regla del proyecto (<code>CLAUDE.md</code>): cualquier cambio en <code>app/ingest.py</code> debe mantener verde
+   <code>tests/test_ingest.py</code>. Lo ideal es extenderla a todo: <b>ningún cambio se instala en planta con una prueba en rojo</b>.</div>
+
+<h3>9.7 Resumen de las pruebas actuales</h3>
+<div class="tw"><table>
+<tr><th>Fichero</th><th>Cubre</th></tr>
+<tr><td><code>test_wincc_csv.py</code> (5)</td><td>Conversión de Time_ms, filas <code>$RT_OFF$</code>, última línea a medio escribir, detección de alarmas y audit, nombres de grupo.</td></tr>
+<tr><td><code>test_ingest.py</code> (5)</td><td>Lectura incremental e idempotente, fichero reiniciado por WinCC, ficheros <code>.keep</code> sin duplicados, BD caída (el lote queda en cola), corte entre lote y marca de lectura. <b>Obligatorio verde</b> al tocar <code>ingest.py</code>.</td></tr>
+<tr><td><code>test_analysis_auth.py</code> (4)</td><td>Límites, episodios y re-muestreo; validación y respaldo de límites; audit trail que detecta manipulación; login, bloqueo y API.</td></tr>
+<tr><td><code>test_reports.py</code> (3)</td><td>Generación, orden de firmas, PAdES válido, verificación SHA-256, manipulación detectada, límite de filas.</td></tr>
+<tr><td><code>test_operacion.py</code> (6)</td><td>Retención, datos purgados que no vuelven, dos ingestas a la vez, bloqueo entre procesos, BD caída antes de recolectar, BD recreada (histórico + límites).</td></tr>
+<tr><td><code>test_permisos_audit.py</code> (10)</td><td>Matriz endpoint × rol completa y autoverificada, sin sesión = 401, baja de usuario corta su sesión, audit de todos los cambios con antes/después.</td></tr>
+<tr><td><code>test_golden.py</code> (5)</td><td>Extractos reales de registro, analizador, alarmas y AuditTrail, y proyecto real de punta a punta.</td></tr>
+<tr><td><code>test_propiedades.py</code> (4)</td><td>hypothesis: ingesta sin pérdida ni duplicados en secuencias al azar, lector sin pérdida, conversiones.</td></tr>
+<tr><td><code>test_parametrizadas.py</code> (101)</td><td>Formatos, nombres de fichero, límites, textos de alarma, roles y contraseñas.</td></tr>
+<tr><td><code>test_analisis_limites.py</code> (12)</td><td>Cada anomalía por separado, notas, alarmas WinCC del tag y botón Sugerir.</td></tr>
+<tr><td><code>test_usuarios_informes.py</code> (11)</td><td>Usuarios y sesiones, errores de informes y firmas, CSV defectuosos, regresión del fichero abierto.</td></tr>
+<tr><td><code>test_volumen.py</code> (1, lenta)</td><td>3 meses a 1 min: conteo exacto y tiempos de ingesta y análisis.</td></tr>
+<tr><td><code>test_reports_xlsx.py</code> (9)</td><td>Excel: contenido igual al informe (hojas, valores, colores, gráficas, firmas, enlace al PDF, protección), sello <code>.p7s</code> válido y que detecta un Excel o una firma alterados, nueva versión por firma, generación bajo demanda de informes antiguos, datos manipulados, descargas y audit.</td></tr>
+<tr><th>Total</th><th>176 pruebas · 95,2 % de cobertura</th></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 10 -->
+<section id="mejoras">
+<h2><span class="n">10</span>Puntos débiles y hoja de ruta</h2>
+<p>Resultado de revisar el código. <span class="tag p1">Alta</span> antes de producción,
+   <span class="tag p2">Media</span> en las siguientes versiones, <span class="tag p3">Baja</span> cuando haya tiempo.</p>
+<div class="tw"><table>
+<tr><th>Prioridad</th><th>Mejora</th><th>Por qué</th></tr>
+<tr><td><span class="tag p1">Alta</span></td><td>Control de versiones (git)</td><td>La carpeta no es un repositorio git: no hay historial de cambios ni forma de volver atrás. En GMP, además, hace falta trazabilidad del software.</td></tr>
+<tr><td><span class="tag p1">Alta</span></td><td>Migraciones con Alembic</td><td>Hoy las tablas se crean con <code>create_all</code>, que no altera tablas existentes. Un cambio de columna en producción exigiría tocar la BD a mano.</td></tr>
+<tr><td><span class="tag p1">Alta</span></td><td>Respaldo automático de la BD</td><td>Una tarea diaria con la API de backup de SQLite (copia consistente en caliente) a otro disco o a la red, con varias copias rotativas.</td></tr>
+<tr><td><span class="tag p1">Alta</span></td><td>Verificación del audit trail visible</td><td><code>audit.verify_chain()</code> existe, pero ningún endpoint ni pantalla lo usa. Conviene un botón «Verificar integridad» y una comprobación diaria automática.</td></tr>
+<tr><td><span class="tag p1">Alta</span></td><td>Audit trail con secreto (HMAC) o anclado</td><td>La cadena SHA-256 detecta cambios sueltos, pero quien tenga acceso al fichero de la BD podría recalcular toda la cadena. Con HMAC (clave fuera de la BD) o publicando el último hash en cada informe sellado eso deja de ser posible.</td></tr>
+<tr><td><span class="tag p1">Alta</span></td><td>Certificado corporativo para los sellos</td><td>El certificado autofirmado prueba integridad pero no identidad ante terceros. Configurar <code>report.cert_pfx</code> con uno de la empresa: lo usan tanto el PAdES del PDF como el <code>.p7s</code> del Excel.</td></tr>
+<tr><td><span class="tag p3">Baja</span></td><td>Firma nativa de Office en el Excel</td><td>Hoy el Excel se firma con un <code>.p7s</code> separado. Si se pidiera que Excel muestre la cinta «libro firmado», habría que construir la firma XML del paquete Office. Es más trabajo y hay que validarlo en un PC con Excel instalado.</td></tr>
+<tr><td><span class="tag p1">Alta</span></td><td>ECharts local y borrar la cuenta de desarrollo</td><td>Ejecutar <code>descargar_vendor.ps1</code> (planta sin internet) y eliminar <code>dev_credentials.txt</code> y su usuario.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Alerta de riesgo de pérdida</td><td>Avisar en la interfaz (y en el log) si la ingesta lleva más de N horas sin correr o si un CSV pasa del 80 % de las 500.000 filas.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Inicio de sesión único desde WinCC</td><td>Pasar el usuario activo de WinCC al abrir la pestaña Informes para no pedir login dos veces (la firma seguiría pidiendo contraseña).</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Informes grandes en segundo plano</td><td>Un informe de 443 páginas tarda unos 7 s y bloquea esa petición. Una cola con barra de progreso evita que el usuario pulse dos veces.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Log a fichero con rotación</td><td>Al correr como servicio con <code>pythonw</code> no hay consola: los errores deben quedar en <code>data\logs</code>.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Separar la ingesta del servidor web</td><td>Si el servidor cae, la ingesta también. Como servicio aparte (o tarea programada independiente), cada parte se reinicia sola sin arrastrar a la otra.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Pruebas de la interfaz</td><td>Hoy solo hay pruebas de servidor. Pruebas end-to-end (p. ej. Playwright) del flujo Analizar → Generar → Firmar.</td></tr>
+<tr><td><span class="tag p2">Media</span></td><td>Paquete de validación (IQ/OQ/PQ)</td><td>Especificación de requisitos, matriz de trazabilidad requisito → prueba y protocolos. Las pruebas automáticas son una buena base para la OQ.</td></tr>
+<tr><td><span class="tag p3">Baja</span></td><td>Exportar a Excel/CSV</td><td>Los datos del análisis para quien quiera trabajarlos aparte (registrado en el audit).</td></tr>
+<tr><td><span class="tag p3">Baja</span></td><td>Plantillas de informe</td><td>Guardar selecciones frecuentes (variables + muestreo) como plantilla, p. ej. «Informe semanal salas limpias».</td></tr>
+<tr><td><span class="tag p3">Baja</span></td><td>Hora y cambio horario</td><td>Los tiempos son hora local, como WinCC. Si la planta tuviera horario de verano, una hora se repetiría o faltaría; habría que guardar también UTC.</td></tr>
+<tr><td><span class="tag p3">Baja</span></td><td>Pasar a SQL Server o PostgreSQL</td><td>Cuando haya varios proyectos o más de un año de histórico. Es un cambio de URL más el driver.</td></tr>
+</table></div>
+</section>
+
+<!-- ============================================================ 11 -->
+<section id="guion">
+<h2><span class="n">11</span>Guion para una presentación (15–20 min)</h2>
+<ol class="steps">
+  <li><b>El problema</b> (2 min): CSV de WinCC con tope de 500.000 filas, sin historia, sin análisis y sin firma.</li>
+  <li><b>La solución en una frase</b> (1 min): «copia sin pérdida a una BD, analiza y emite informes firmados verificables».</li>
+  <li><b>Arquitectura</b> (3 min): el diagrama del apartado 2, con la ingesta en dos etapas como idea clave.</li>
+  <li><b>Demo en vivo</b> (6 min): entrar, elegir variables, Analizar, mostrar una alarma HH en la gráfica, Generar reporte, abrir el PDF (gráficas, valores tabulados, firmas).</li>
+  <li><b>Integridad</b> (3 min): firmar Revisado con otro usuario, verificar el PDF; modificar una copia y ver que falla la verificación.</li>
+  <li><b>Hoja de ruta</b> (2 min): las mejoras de prioridad alta del apartado 10.</li>
+  <li><b>Preguntas</b>.</li>
+</ol>
+</section>
+
+<footer>Gestor de Registros WinCC · STE-EngiPharm · documento generado el 24/11/2026 a partir del código fuente; actualizado el 25/11/2026 (pruebas).</footer>
+</main>
+</div>
+<script>
+(function(){
+  var root=document.documentElement, KEY="guia-tema";
+  try{var t=localStorage.getItem(KEY); if(t) root.setAttribute("data-theme",t);}catch(e){}
+  document.getElementById("themeBtn").addEventListener("click",function(){
+    var dark=root.getAttribute("data-theme")==="dark" ||
+      (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    var next=dark?"light":"dark"; root.setAttribute("data-theme",next);
+    try{localStorage.setItem(KEY,next);}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

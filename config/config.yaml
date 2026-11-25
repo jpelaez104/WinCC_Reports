@@ -1,0 +1,58 @@
+# Configuracion del Gestor de Registros WinCC
+# Las rutas relativas se resuelven respecto a la carpeta GestorRegistros.
+
+database:
+  # Desarrollo: SQLite (un archivo). Para escalar basta con cambiar la URL, por ejemplo:
+  #   SQL Server Express: mssql+pyodbc://usuario:clave@localhost\SQLEXPRESS/GestorRegistros?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
+  #   PostgreSQL:         postgresql+psycopg://usuario:clave@localhost/gestor
+  url: "sqlite:///data/gestor.db"
+
+data_dir: "data"            # cola persistente, estado de lectura, respaldos de limites
+retention_days: 92          # ~3 meses de historico en la base de datos
+
+ingest:
+  interval_minutes: 15      # lectura incremental periodica (0 = desactivada)
+  daily_time: "12:00"       # lectura/consolidacion diaria garantizada
+  keep_done_batches_days: 7 # dias que se conservan los lotes ya cargados (auditoria)
+
+server:
+  host: "127.0.0.1"         # solo accesible desde el mismo PC de WinCC
+  port: 8080
+
+security:
+  session_minutes: 480
+  max_failed_logins: 5
+
+analysis:
+  flatline_minutes: 60      # valor identico durante N minutos => posible sensor congelado
+  outlier_mad_z: 6.0        # z robusto (MAD) a partir del cual un punto es atipico
+  gap_factor: 3.0           # hueco = intervalo > gap_factor * periodo nominal de registro
+
+report:                     # informes PDF firmados (solo bajo demanda: boton "Generar reporte")
+  organization: "STE-EngiPharm"
+  location: "Planta"
+  max_table_rows: 20000     # filas de valores tabulados (periodo / muestreo); 7 dias a 1 min = 10080
+  max_episode_rows: 60      # eventos por variable listados en el PDF
+  max_wincc_audit_rows: 500
+  pades: true               # sello digital: PAdES dentro del PDF y fichero .p7s junto al Excel
+  xlsx: true                # emitir tambien el informe en Excel (.xlsx) en cada version
+  # cert_pfx: "C:/certs/empresa.pfx"   # certificado corporativo; contrasena en la variable de entorno:
+  # cert_password_env: GESTOR_CERT_PASSWORD
+
+projects:
+  - id: archivos
+    name: "HVAC ION (Archivos)"
+    root: "../Archivos"
+    folders:
+      registros: ["Registros"]
+      analizador: ["Analizador de red"]
+      alarmas: ["Alarmas"]
+      audit: ["Auditrail"]
+
+  - id: ejemplo
+    name: "HVAC Pharmalik (Ejemplo)"
+    root: "../Ejemplo"
+    folders:
+      registros: ["Registro datos"]
+      alarmas: ["Alarmas"]
+      audit: ["AuditTrail"]

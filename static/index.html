@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Informes WinCC</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginView" class="center hidden">
+  <form id="loginForm" class="panel login" autocomplete="off">
+    <h1>Gestor de registros WinCC</h1>
+    <div class="muted">Ingrese con su usuario de WinCC o de desarrollador.</div>
+    <label class="field">Usuario<input type="text" name="username" required autofocus></label>
+    <label class="field">Contraseña<input type="password" name="password" required></label>
+    <div class="error" id="loginError"></div>
+    <button class="btn primary" type="submit">Ingresar</button>
+  </form>
+</div>
+
+<!-- ============ APLICACION ============ -->
+<div id="appView" class="hidden">
+  <div class="topbar">
+    <div class="brand">Informes <small>Gestor de registros WinCC</small></div>
+    <label class="field">Proyecto<select id="projectSel"></select></label>
+    <div class="spacer"></div>
+    <div class="userbox">
+      <span id="userName"></span><span class="badge" id="userRole"></span>
+      <button class="btn small" id="btnPw">Contraseña</button>
+      <button class="btn small" id="btnLogout">Salir</button>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="analisis" class="active">Análisis</button>
+    <button data-tab="informes">Informes</button>
+    <button data-tab="limites">Límites de alarma</button>
+    <button data-tab="alarmas">Alarmas WinCC</button>
+    <button data-tab="audit">Audit trail</button>
+    <button data-tab="usuarios" data-role="admin">Usuarios</button>
+    <button data-tab="ingesta">Ingesta</button>
+  </nav>
+
+  <main>
+    <!-- ---------- ANALISIS ---------- -->
+    <section data-view="analisis" class="analysis">
+      <aside class="panel side">
+        <div class="row">
+          <label class="field">Inicio<input type="datetime-local" id="dtStart" step="60"></label>
+          <label class="field">Fin<input type="datetime-local" id="dtEnd" step="60"></label>
+        </div>
+        <div class="quick" id="quickRanges">
+          <button class="btn small" data-h="1">1 h</button>
+          <button class="btn small" data-h="8">8 h</button>
+          <button class="btn small" data-h="24">24 h</button>
+          <button class="btn small" data-h="168">7 días</button>
+          <button class="btn small" data-h="720">30 días</button>
+          <button class="btn small" data-h="2208">3 meses</button>
+        </div>
+        <div class="row">
+          <label class="field">Muestreo
+            <select id="stepSel">
+              <option value="60" selected>1 minuto</option>
+              <option value="300">5 minutos</option>
+              <option value="600">10 minutos</option>
+              <option value="900">15 minutos</option>
+              <option value="1800">30 minutos</option>
+              <option value="3600">1 hora</option>
+              <option value="86400">1 día</option>
+              <option value="custom">Personalizado…</option>
+            </select>
+          </label>
+          <span id="customStep" class="row hidden" style="flex:1 1 100%">
+            <label class="field">Valor<input type="number" id="customVal" min="1" value="2"></label>
+            <label class="field">Unidad<select id="customUnit"><option value="1">segundos</option><option value="60" selected>minutos</option><option value="3600">horas</option></select></label>
+          </span>
+        </div>
+        <div class="row">
+          <input type="text" id="varFilter" placeholder="Buscar variable…">
+        </div>
+        <div class="row" style="justify-content:space-between">
+          <span class="muted" id="varCount" style="flex:0 1 auto"></span>
+          <span style="flex:0 1 auto"><button class="btn small" id="selAll">Todas</button> <button class="btn small" id="selNone">Ninguna</button></span>
+        </div>
+        <div class="varlist" id="varList"></div>
+        <button class="btn primary" id="btnAnalyze">Analizar</button>
+        <button class="btn" id="btnReport" data-role="operador" title="Genera el PDF firmado con el rango, muestreo y variables seleccionados">Generar reporte</button>
+      </aside>
+      <div class="cards" id="cards"><div class="panel empty">Seleccione el rango, el muestreo y las variables, y pulse <b>Analizar</b>.</div></div>
+    </section>
+
+    <!-- ---------- INFORMES ---------- -->
+    <section data-view="informes" class="hidden">
+      <div class="panel">
+        <header><h2>Informes firmados</h2>
+          <span class="muted">Se generan solo con el botón <b>Generar reporte</b> de la pestaña Análisis. Firmas: Elaborado → Revisado → Aprobado, cada una por un usuario distinto. Cada versión se emite en PDF y en Excel (con su sello .p7s).</span>
+          <span class="spacer"></span>
+          <label class="btn small" title="Comprueba si un PDF, un Excel (.xlsx) o un sello .p7s es una copia auténtica emitida por el gestor">Verificar archivo<input type="file" id="verifyFile" accept=".pdf,.xlsx,.p7s,application/pdf" hidden></label>
+          <a class="btn small" href="/api/reports/certificate" title="Certificado público del sello digital (PAdES del PDF y .p7s del Excel)">Certificado</a>
+        </header>
+        <div class="body hidden" id="verifyResult"></div>
+        <div class="tablewrap"><table id="reportsTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ---------- LIMITES ---------- -->
+    <section data-view="limites" class="hidden">
+      <div class="panel">
+        <header><h2>Límites por variable</h2>
+          <span class="muted">LL ≤ L ≤ H ≤ HH. H/L = pre-alarma, HH/LL = alarma. Se guardan en la base de datos y en un respaldo; persisten hasta que se cambien.</span>
+        </header>
+        <div class="tablewrap"><table id="limitsTable"></table></div>
+      </div>
+      <div class="panel" style="margin-top:16px">
+        <header><h2>Tags con alarma analógica detectados en FileAlarms</h2><span class="muted">Asocie cada tag a su variable en la tabla de arriba para cruzar alarmas reales y sugerir límites.</span></header>
+        <div class="tablewrap"><table id="tagsTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ---------- ALARMAS ---------- -->
+    <section data-view="alarmas" class="hidden">
+      <div class="panel">
+        <header><h2>Alarmas y avisos WinCC</h2><span class="muted" id="alarmRange"></span>
+          <label class="userbox"><input type="checkbox" id="onlyActive" checked> solo entrantes</label>
+          <input type="text" id="alarmFilter" placeholder="Filtrar texto…">
+        </header>
+        <div class="tablewrap"><table id="alarmsTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ---------- AUDIT ---------- -->
+    <section data-view="audit" class="hidden">
+      <div class="panel">
+        <header><h2>Audit trail WinCC</h2><span class="muted" id="auditRange"></span></header>
+        <div class="tablewrap"><table id="winccAuditTable"></table></div>
+      </div>
+      <div class="panel" style="margin-top:16px" data-role="supervisor">
+        <header><h2>Audit trail del gestor</h2><span id="chainState"></span></header>
+        <div class="tablewrap"><table id="appAuditTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ---------- USUARIOS ---------- -->
+    <section data-view="usuarios" class="hidden">
+      <div class="panel">
+        <header><h2>Usuarios</h2>
+          <span class="muted">Los usuarios de WinCC se detectan en el AuditTrail y quedan inactivos hasta asignarles contraseña inicial.</span>
+          <span class="spacer"></span>
+          <button class="btn small" id="btnSyncUsers">Sincronizar con WinCC</button>
+          <button class="btn small primary" id="btnNewUser">Nuevo usuario</button>
+        </header>
+        <div class="tablewrap"><table id="usersTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ---------- INGESTA ---------- -->
+    <section data-view="ingesta" class="hidden">
+      <div class="panel">
+        <header><h2>Ingesta de ficheros</h2><span id="ingestState"></span><span class="spacer"></span>
+          <button class="btn small primary" id="btnIngest" data-role="admin">Ejecutar ahora</button></header>
+        <div class="body muted" id="ingestSummary"></div>
+        <div class="tablewrap"><table id="filesTable"></table></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ DIALOGOS ============ -->
+<dialog id="pwDialog">
+  <form method="dialog" id="pwForm">
+    <h3 style="margin:0">Cambiar contraseña</h3>
+    <div class="muted" id="pwReason"></div>
+    <label class="field">Contraseña actual<input type="password" name="old" required></label>
+    <label class="field">Nueva contraseña<input type="password" name="new1" required minlength="8"></label>
+    <label class="field">Repetir nueva<input type="password" name="new2" required minlength="8"></label>
+    <div class="error" id="pwError"></div>
+    <div class="row"><button class="btn" value="cancel" formnovalidate id="pwCancel">Cancelar</button><button class="btn primary" value="ok">Guardar</button></div>
+  </form>
+</dialog>
+
+<dialog id="userDialog">
+  <form method="dialog" id="userForm">
+    <h3 style="margin:0" id="userDlgTitle">Usuario</h3>
+    <label class="field">Usuario<input type="text" name="username" required></label>
+    <label class="field">Nombre<input type="text" name="display_name"></label>
+    <label class="field">Origen<select name="source"><option value="desarrollador">Desarrollador</option><option value="wincc">WinCC</option></select></label>
+    <label class="field">Rol<select name="role"><option>lector</option><option>operador</option><option>supervisor</option><option>admin</option><option>desarrollador</option></select></label>
+    <label class="field">Contraseña inicial<input type="password" name="password" minlength="8"></label>
+    <label class="userbox"><input type="checkbox" name="active" checked> Activo</label>
+    <div class="error" id="userError"></div>
+    <div class="row"><button class="btn" value="cancel" formnovalidate>Cancelar</button><button class="btn primary" value="ok">Guardar</button></div>
+  </form>
+</dialog>
+
+<dialog id="reportDialog">
+  <form method="dialog" id="reportForm">
+    <h3 style="margin:0" id="repDlgTitle">Generar reporte firmado</h3>
+    <div class="muted" id="repSummary"></div>
+    <div id="repNewFields">
+      <label class="field">Título<input type="text" name="title" maxlength="300"></label>
+      <label class="field">Comentario del informe<textarea name="comment" rows="2" maxlength="2000"></textarea></label>
+    </div>
+    <div class="sigbox">
+      <div>Firma electrónica: <b id="repMeaning">Elaborado</b> por <b id="repSigner"></b></div>
+      <label class="field">Contraseña<input type="password" name="password" required autocomplete="current-password"></label>
+      <label class="field">Comentario de la firma (opcional)<input type="text" name="sign_comment" maxlength="500"></label>
+      <label class="userbox"><input type="checkbox" name="agree" required> <span id="repDeclaration"></span></label>
+    </div>
+    <div class="error" id="repError"></div>
+    <div class="row"><button class="btn" value="cancel" formnovalidate>Cancelar</button><button class="btn primary" value="ok" id="repOk">Firmar y generar</button></div>
+  </form>
+</dialog>
+
+<!-- ECharts: copia local (offline en planta) con respaldo CDN -->
+<script src="vendor/echarts.min.js"></script>
+<script>window.echarts || document.write('<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"><\/script>')</script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+﻿# Dependencias DIRECTAS del Gestor de Registros WinCC (versiones fijadas).
+# Python 3.12 (Windows).
+#
+# Regla: toda dependencia nueva se agrega con  scripts\agregar_dependencia.ps1 <paquete>
+# que la instala, la fija aqui con la version instalada y regenera requirements-lock.txt
+# (arbol completo, incluidas las dependencias transitivas).
+#
+# Instalacion reproducible exacta:   .venv\Scripts\pip install -r requirements-lock.txt
+
+# --- Servidor web / API ---
+fastapi==0.165.0
+uvicorn==0.54.0
+
+# --- Base de datos (SQLite en desarrollo; SQL Server / PostgreSQL cambiando la URL) ---
+SQLAlchemy==2.1.9
+
+# --- Datos y estadistica ---
+pandas==3.1.1
+numpy==2.5.5
+
+# --- Configuracion y tareas programadas ---
+PyYAML==6.0.4
+APScheduler==3.11.3
+
+# --- Pruebas (desarrollo) ---
+pytest==9.2.0
+httpx2==2.16.2    # cliente de starlette.testclient (sustituye a httpx, obsoleto en Starlette 1.10)
+pytest-cov==7.1.0         # cobertura de codigo (scripts\probar.ps1)
+hypothesis==6.170.17      # pruebas por propiedades (tests\test_propiedades.py)
+
+# --- Agregadas con agregar_dependencia.ps1 ---
+reportlab==5.1.1
+matplotlib==3.11.2
+pyhanko==0.38.2
+openpyxl==3.1.5

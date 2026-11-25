@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestor de Registros WinCC — Reglas del proyecto</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1b2430;--muted:#5b6675;--line:#dde2e8;--accent:#1f5fa8;--accent-soft:#e7eff9;--code:#f0f2f5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#12161c;--panel:#1a2029;--ink:#e4e8ee;--muted:#9aa5b3;--line:#2c3440;--accent:#6aa5e8;--accent-soft:#1d2b3c;--code:#222a35}}
+:root[data-theme="dark"]{--bg:#12161c;--panel:#1a2029;--ink:#e4e8ee;--muted:#9aa5b3;--line:#2c3440;--accent:#6aa5e8;--accent-soft:#1d2b3c;--code:#222a35}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Segoe UI",system-ui,sans-serif}
+main{max-width:900px;margin:0 auto;padding:36px 16px 60px}
+header.hero,section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 28px;margin-bottom:20px}
+h1{margin:0 0 6px;font-size:26px}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:13px;background:var(--code);padding:1px 5px;border-radius:4px}
+.rule{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.rule:last-child{border-bottom:0}
+.rule .k{font-weight:700;color:var(--accent)}
+.src{color:var(--muted);font-size:12.5px}
+a{color:var(--accent)}
+.theme-btn{float:right;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer;font-size:12.5px}
+@media (max-width:640px){.rule{grid-template-columns:1fr;gap:2px}header.hero,section{padding:18px 16px}}
+@media print{.theme-btn{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+  <button class="theme-btn" id="themeBtn" type="button">Tema claro/oscuro</button>
+  <h1>Reglas del proyecto</h1>
+  <p>Normas de desarrollo del Gestor de Registros WinCC. Las siguen tanto las personas como el asistente de IA (Claude Code).</p>
+  <p class="src">Versión HTML de <code>CLAUDE.md</code>. Ver también el <a href="README.html">README</a> y la <a href="Guia_Gestor_Registros.html">guía técnica y de uso</a>.</p>
+</header>
+<section>
+  <div class="rule"><div class="k">Entorno</div><div>Python 3.12 en <code>.venv</code>. Ejecutar siempre con <code>.venv\Scripts\python.exe</code>.</div></div>
+  <div class="rule"><div class="k">Dependencias</div><div>Toda dependencia nueva se instala con <code>scripts\agregar_dependencia.ps1 &lt;paquete&gt;</code>, que la
+     fija con su versión en <code>requirements.txt</code> y regenera <code>requirements-lock.txt</code>. Nunca <code>pip install</code> suelto.</div></div>
+  <div class="rule"><div class="k">Idioma y tiempo</div><div>Código y textos de la interfaz en español. Tiempos internos = epoch ms en hora <b>local</b> de planta (como WinCC).</div></div>
+  <div class="rule"><div class="k">Base de datos</div><div>La BD se elige solo por la URL de <code>config/config.yaml</code>. Usar únicamente tipos y consultas SQLAlchemy genéricos
+     (nada específico de SQLite) para poder migrar a SQL Server o PostgreSQL.</div></div>
+  <div class="rule"><div class="k">Ingesta</div><div>La ingesta nunca debe perder ni duplicar datos: cualquier cambio en <code>app/ingest.py</code> debe mantener verdes
+     <code>tests/test_ingest.py</code>, <code>tests/test_operacion.py</code> y <code>tests/test_propiedades.py</code>.</div></div>
+  <div class="rule"><div class="k">Pruebas</div><div>Antes de dar un cambio por terminado, <code>.\scripts\probar.ps1</code> (o <code>-Rapido</code>) debe acabar en
+     «TODO EN VERDE»: todas las pruebas pasan, sin avisos (<code>pytest.ini</code> los convierte en error) y cada módulo crítico
+     (ingest, wincc_csv, reports, auth) con cobertura ≥ 90 %. Código nuevo ⇒ pruebas nuevas. Endpoint nuevo ⇒ declararlo en la
+     matriz de <code>tests/test_permisos_audit.py</code>.</div></div>
+  <div class="rule"><div class="k">Audit trail</div><div>Todo cambio de configuración hecho por usuarios (límites, variables, usuarios) se registra con <code>app.audit.record</code>.</div></div>
+  <div class="rule"><div class="k">Documentación</div><div>La que leen las personas va en HTML autocontenido en <code>docs/</code>. Los <code>.md</code> (<code>README.md</code>,
+     <code>CLAUDE.md</code>) se conservan como contexto para la IA; al cambiar uno, actualizar también su copia
+     <code>docs/README.html</code> / <code>docs/CLAUDE.html</code>.</div></div>
+</section>
+</main>
+<script>
+(function(){var r=document.documentElement,K="guia-tema";try{var t=localStorage.getItem(K);if(t)r.setAttribute("data-theme",t);}catch(e){}
+document.getElementById("themeBtn").addEventListener("click",function(){var d=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);var n=d?"light":"dark";r.setAttribute("data-theme",n);try{localStorage.setItem(K,n);}catch(e){}});})();
+</script>
+</body>
+</html>

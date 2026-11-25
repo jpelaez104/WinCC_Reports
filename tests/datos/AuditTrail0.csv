@@ -1,0 +1,70 @@
+"RecordID";"TimeStamp";"DeltaToUTC";"UserID";"ObjectID";"Description";"Comment";"Checksum"
+0;"01/11/2026 1:10:01";"-1:00";"Sistema";"Aplicación";"Nuevo archivo de informe durante la ejecución de WinCC Runtime Advanced V17.0 en el panel de operador DESKTOP-0I5UFMU. Proyecto: 'PHARMALIK_PI23-01653ES_v6.5.PC-HVAC - 0' Build 128, creado con WinCC Advanced / Unified PC V17 Update 8";;0DaP/o
+14112;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;cmKR6S
+14113;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;cwS1Bh
+14114;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;B8C8wt
+14115;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;Q+udHz
+14116;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;COlzMX
+14117;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;Y4pUhv
+14118;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;DUbnxw
+14119;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;x4z82G
+14120;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;yeElju
+14121;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;EhGB6n
+14122;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;Jwcbiq
+14123;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;P4iewN
+14124;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;tBhG8u
+14125;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;JoCnH+
+14126;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;3B8vw8
+14127;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;0bp5lO
+14128;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;VsHSqm
+14129;"01/11/2026 1:10:01";"-1:00";"Sistema";"Ficheros";"Exportar un fichero. ";;G/zbrt
+14130;"03/11/2026 0:34:40";"-1:00";"Admin";"Administración de usuarios";"El usuario 'Admin' ha iniciado una sesión con el grupo 'Administrador'.";;GKcjpE
+14131;"03/11/2026 0:34:43";"-1:00";"Admin";"Pulsador ventana emergente: SISTEMA 8";"Se abre ventana emergente Control horario";;RQmgaL
+14132;"03/11/2026 0:34:47";"-1:00";"Admin";"Botón habilita día: SISTEMA 8";"Se habilita martes del intervalo 3 del control horario";;Ka/ciZ
+14133;"03/11/2026 0:34:49";"-1:00";"Admin";"Botón habilita día: SISTEMA 8";"Se habilita lunes del intervalo 3 del control horario";;EP+VkO
+14134;"03/11/2026 0:34:51";"-1:00";"Admin";"Botón habilita día: SISTEMA 8";"Se habilita miercoles del intervalo 3 del control horario";;jkcFMz
+14135;"03/11/2026 0:35:21";"-1:00";"Admin";"Pulsador ventana emergente: SISTEMA 8";"Se abre ventana emergente Control horario";;lF9c+j
+14136;"03/11/2026 0:35:25";"-1:00";"Admin";"Pulsador ventana emergente: CTA-08";"Se abre ventana emergente motor";;LbcuIO
+14137;"03/11/2026 0:35:27";"-1:00";"Admin";"Pulsador reset: CTA-08";"Se pulsa botón reset alarmas motor";;PDra7f
+14138;"03/11/2026 0:35:27";"-1:00";"Admin";"Pulsador reset: CTA-08";"Se pulsa botón reset alarmas motor";;njQC1D
+14139;"03/11/2026 0:35:27";"-1:00";"Admin";"Pulsador reset: CTA-08";"Se pulsa botón reset alarmas motor";;FjOqGy
+14140;"03/11/2026 0:35:28";"-1:00";"Admin";"Pulsador reset: CTA-08";"Se pulsa botón reset alarmas motor";;SYTrgz
+14141;"03/11/2026 0:35:28";"-1:00";"Admin";"Pulsador reset: CTA-08";"Se pulsa botón reset alarmas motor";;2rg/vB
+14142;"03/11/2026 0:35:34";"-1:00";"Admin";"Control general: Pulsador reset alarmas";"Se pulsa botón reset alarmas general";;X5jsQI
+14143;"03/11/2026 0:35:34";"-1:00";"Admin";"Control general: Pulsador reset alarmas";"Se pulsa botón reset alarmas general";;dXuC2o
+14144;"03/11/2026 0:35:35";"-1:00";"Admin";"Control general: Pulsador reset alarmas";"Se pulsa botón reset alarmas general";;FdLWDc
+14145;"03/11/2026 0:35:35";"-1:00";"Admin";"Control general: Pulsador reset alarmas";"Se pulsa botón reset alarmas general";;O57B5K
+14146;"03/11/2026 0:50:47";"-1:00";"Sistema";"Administración de usuarios";"Usuario desconectado.";;5KCeg+
+14147;"09/11/2026 2:23:32";"-1:00";"Sistema";"Aplicación";"La última ejecución del programa no se finalizó correctamente, lo que puede producir pérdidas de datos.";;K8i8zh
+0;"09/11/2026 2:23:32";"-1:00";"Sistema";"Aplicación";"Inicio de runtime de WinCC Runtime Advanced V17.0 en el panel de operador DESKTOP-0I5UFMU. Proyecto: 'PHARMALIK_PI23-01653ES_v6.5.PC-HVAC - 0' Build 128, creado con WinCC Advanced / Unified PC V17 Update 8";;2RO+Em
+14148;"09/11/2026 2:23:32";"-1:00";"Sistema";"Aplicación";"Cambio a modo 'Online'.";;9B4Nn7
+14149;"09/11/2026 2:23:32";"-1:00";"Sistema";"Administración de usuarios";"Importación de la administración de usuarios finalizada con éxito.";;5uXwxB
+14150;"09/11/2026 2:25:29";"-1:00";"Admin";"Administración de usuarios";"El usuario 'Admin' ha iniciado una sesión con el grupo 'Administrador'.";;qVyv3T
+14151;"09/11/2026 2:25:42";"-1:00";"Admin";"Pulsador ventana emergente: CTA-08";"Se abre ventana emergente motor";;+C2+46
+14152;"09/11/2026 2:25:46";"-1:00";"Admin";"Pulsador modo funcionamiento: CTA-08";"Se pulsa botón modo automático motor";;A2r77D
+14153;"09/11/2026 2:26:08";"-1:00";"Admin";"Pulsador modo funcionamiento: CTA-08";"Se pulsa botón modo automático motor";;Kx4kkE
+14154;"09/11/2026 2:26:09";"-1:00";"Admin";"Pulsador modo funcionamiento: CTA-08";"Se pulsa botón modo manual motor";;VBqaQ5
+14155;"09/11/2026 2:26:10";"-1:00";"Admin";"Pulsador órdenes: CTA-08";"Se pulsa botón marcha manual motor";;Ph/WNZ
+14156;"09/11/2026 2:26:11";"-1:00";"Admin";"Pulsador órdenes: CTA-08";"Se pulsa botón marcha manual motor";;fueAld
+14157;"09/11/2026 2:26:12";"-1:00";"Admin";"Pulsador modo funcionamiento: CTA-08";"Se pulsa botón modo automático motor";;E434zQ
+14158;"09/11/2026 2:26:13";"-1:00";"Admin";"Pulsador modo funcionamiento: CTA-08";"Se pulsa botón modo manual motor";;bircS1
+14159;"09/11/2026 2:26:14";"-1:00";"Admin";"Pulsador órdenes: CTA-08";"Se pulsa botón marcha manual motor";;nh0WA0
+14160;"09/11/2026 2:26:14";"-1:00";"Admin";"Pulsador órdenes: CTA-08";"Se pulsa botón marcha manual motor";;UxLgJA
+14161;"09/11/2026 2:26:15";"-1:00";"Admin";"Pulsador órdenes: CTA-08";"Se pulsa botón marcha manual motor";;T5PjJY
+14162;"09/11/2026 2:26:15";"-1:00";"Admin";"Pulsador modo funcionamiento: CTA-08";"Se pulsa botón modo automático motor";;f0saMD
+14163;"09/11/2026 2:26:22";"-1:00";"Admin";"Pulsador ventana emergente: CTA-08";"Se abre ventana emergente motor";;9O2r9C
+14164;"09/11/2026 2:27:05";"-1:00";"Admin";"Pulsador ventana emergente: SISTEMA 8";"Se abre ventana emergente Control horario";;CYgIyv
+14165;"09/11/2026 2:27:19";"-1:00";"Admin";"Botón habilita día: SISTEMA 8";"Se habilita domingo del intervalo 1 del control horario";;Y8LFe8
+14166;"09/11/2026 2:27:20";"-1:00";"Admin";"Botón habilita día: SISTEMA 8";"Se habilita domingo del intervalo 2 del control horario";;KMo+i8
+14167;"09/11/2026 2:27:20";"-1:00";"Admin";"Botón habilita día: SISTEMA 8";"Se habilita domingo del intervalo 3 del control horario";;H2keK1
+14168;"09/11/2026 2:42:39";"-1:00";"Sistema";"Administración de usuarios";"Usuario desconectado.";;2DnjbD
+14169;"11/11/2026 10:07:32";"-1:00";;"Pulsador ventana emergente: SAS / SALA INYECCION";"Se abre ventana emergente Control horario";;EMZ1Zx
+14170;"11/11/2026 10:07:40";"-1:00";"Admin";"Administración de usuarios";"El usuario 'Admin' ha iniciado una sesión con el grupo 'Administrador'.";;xETccX
+14171;"11/11/2026 10:07:41";"-1:00";"Admin";"Botón habilita día: SAS / SALA INYECCION";"Se deshabilita miercoles del intervalo 1 del control horario";;SDiHfh
+14172;"11/11/2026 10:07:41";"-1:00";"Admin";"Botón habilita día: SAS / SALA INYECCION";"Se deshabilita miercoles del intervalo 2 del control horario";;xUBiXZ
+14173;"11/11/2026 10:07:42";"-1:00";"Admin";"Botón habilita día: SAS / SALA INYECCION";"Se deshabilita jueves del intervalo 1 del control horario";;N/mE6K
+14174;"11/11/2026 10:07:42";"-1:00";"Admin";"Botón habilita día: SAS / SALA INYECCION";"Se deshabilita viernes del intervalo 1 del control horario";;lZfCPm
+14175;"11/11/2026 10:22:49";"-1:00";"Sistema";"Administración de usuarios";"Usuario desconectado.";;gUuHap
+14176;"12/11/2026 17:27:49";"-1:00";;"Pulsador ventana emergente: SAS / SALA INYECCION";"Se abre ventana emergente Control horario";;fGg6gF
+14177;"12/11/2026 17:28:01";"-1:00";"Admin";"Administración de usuarios";"El usuario 'Admin' ha iniciado una sesión con el grupo 'Administrador'.";;XVe5Tf
+14178;"12/11/2026 17:28:02";"-1:00";"Admin";"Botón habilita día: SAS / SALA INYECCION";"Se habilita jueves del intervalo 1 del control horario";;Um0hWS
